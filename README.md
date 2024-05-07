@@ -13,8 +13,9 @@ the ELO score on the [LMSYS Leaderboard](https://chat.lmsys.org/?leaderboard).
 This chart shows the cost and quality of each LLM.
 
 Some LLMs are "pareto optimal", i.e. there is no LLM better in both cost and quality.
-These are the LLMs to use.
+These are shown in green 🟢 and are the best LLMs to use.
 
-This chart shows the pareto optimal LLMs in green.
+Some LLMs are "pareto suboptimal", i.e. there is no LLM worse in both cost and quality.
+These are shown in red 🔴 and are the LLMs to avoid.
 
 **Last updated: 1 May 2024**
