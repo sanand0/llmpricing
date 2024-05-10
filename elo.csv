@@ -1,8 +1,8 @@
 model,elo,cpmi,source
-gpt-4-1106-preview,1252.693774,30,
-gpt-4-0125-preview,1246.738639,30,
-gpt-4-0314,1189.555894,30,
-gpt-4-0613,1165.276503,30,
+gpt-4-1106-preview,1252.693774,10,https://openai.com/api/pricing/
+gpt-4-0125-preview,1246.738639,10,https://openai.com/api/pricing/
+gpt-4-0314,1189.555894,30,https://platform.openai.com/docs/deprecations/
+gpt-4-0613,1165.276503,30,https://platform.openai.com/docs/deprecations/
 claude-3-opus-20240229,1250.98372,15,
 gpt-4-turbo-2024-04-09,1258.809213,10,
 mistral-large-2402,1157.205594,8,
