@@ -26,7 +26,6 @@ models.forEach((model) => {
   model.optimal = isBest ? "best" : isWorst ? "worst" : "";
 });
 
-
 document.querySelector("#llm-cost").replaceChildren(
   Plot.plot({
     marginLeft: 50,
