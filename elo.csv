@@ -10,7 +10,7 @@ claude-3-opus-20240229,1248,15,
 gpt-4-0125-preview,1246,10,https://openai.com/api/pricing/
 yi-large-preview,1239,,
 gemini-1.5-flash-api-0514,1232,0.35,https://ai.google.dev/pricing
-gemma-2-27b-it,1212,0.20,https://openrouter.ai/models/google/gemma-7b-it
+gemma-2-27b-it,1212,,
 yi-large,1239,3,https://openrouter.ai/models/01-ai/yi-large
 bard-jan-24-gemini-pro,1208,7,https://ai.google.dev/pricing
 llama-3-70b-instruct,1207,0.59,https://openrouter.ai/models/meta-llama/llama-3-70b-instruct
