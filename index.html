@@ -51,7 +51,14 @@
     <h1 class="display-1 my-4 text-center">LLM Pricing</h1>
     <h2 class="display-6 text-center">Which LLMs are the best value for money?</h2>
     <div id="README" class="my-5 mx-auto" style="max-width: 30rem"></div>
-    <div class="text-center my-3">🟢 Best models 🔴 Worst models</div>
+    <div class="row align-items-center mt-4">
+      <div class="col-md-6 col-lg-4 col-xl-3">
+        <input id="model" class="form-control mb-3" placeholder="Filter models">
+      </div>
+      <div class="col-md-6 col-lg-8 col-xl-9">
+        <div class="text-end mb-3">🟢 Best models 🔴 Worst models</div>
+      </div>
+    </div>
     <div id="llm-cost" class="img-fluid"></div>
   </div>
 

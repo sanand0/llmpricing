@@ -2,6 +2,7 @@ import { num, num0 } from "https://cdn.jsdelivr.net/npm/@gramex/ui@0.3/dist/form
 import { marked } from "https://cdn.jsdelivr.net/npm/marked@12/+esm";
 import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
+import { default as fuzzysort } from "https://cdn.jsdelivr.net/npm/fuzzysort@3/+esm";
 
 const content = await fetch("README.md").then((r) => r.text());
 document.querySelector("#README").innerHTML = marked.parse(content);
@@ -72,3 +73,20 @@ document.querySelector("#llm-cost").replaceChildren(
     ],
   }),
 );
+
+const circles = document.querySelectorAll("#llm-cost circle");
+models.forEach((model, i) => (model.node = circles[i]));
+const modelNames = Object.fromEntries(models.map((d) => [d.model, d]));
+const texts = document.querySelectorAll('#llm-cost [aria-label="text"] text');
+
+document.querySelector("#model").addEventListener("input", (event) => {
+  const search = event.target.value.trim();
+  texts.forEach((text) => (text.style.opacity = search ? 0 : 1));
+  const results = fuzzysort.go(search, Object.keys(modelNames), { theshold: -20 });
+  const matches = new Set(results.map((r) => r.target));
+  models.forEach(({ model, node }) => {
+    const match = search ? matches.has(model) : true;
+    node.style.opacity = match ? 1 : 0;
+    node.style.pointerEvents = match ? "all" : "none";
+  });
+});
