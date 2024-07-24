@@ -1,5 +1,6 @@
 model,elo,cpmi,source
 gpt-4o-2024-05-13,1287,5,https://openai.com/api/pricing/
+gpt-4o-mini-2024-07-18,1280,0.15,https://openai.com/api/pricing/
 claude-3-5-sonnet-20240620,1271,3,
 gemini-advanced-0514,1267,,
 gemini-1.5-pro-api-0514,1263,3.5,https://ai.google.dev/pricing
@@ -8,9 +9,9 @@ gpt-4-turbo-2024-04-09,1256,10,https://openai.com/api/pricing/
 gpt-4-1106-preview,1252,10,https://openai.com/api/pricing/
 claude-3-opus-20240229,1248,15,
 gpt-4-0125-preview,1246,10,https://openai.com/api/pricing/
-yi-large-preview,1239,,
+yi-large-preview,1239,3,https://openrouter.ai/models/01-ai/yi-large
 gemini-1.5-flash-api-0514,1232,0.35,https://ai.google.dev/pricing
-gemma-2-27b-it,1212,,
+gemma-2-27b-it,1212,0.27,https://openrouter.ai/models/google/gemma-2-27b-it
 yi-large,1239,3,https://openrouter.ai/models/01-ai/yi-large
 bard-jan-24-gemini-pro,1208,7,https://ai.google.dev/pricing
 nemotron-4-340b-instruct,1207,4.2,https://openrouter.ai/models/nvidia/nemotron-4-340b-instruct
