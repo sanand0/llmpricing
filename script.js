@@ -4,43 +4,59 @@ import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm"
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 import { default as fuzzysort } from "https://cdn.jsdelivr.net/npm/fuzzysort@3/+esm";
 
+// Load and display README content
 const content = await fetch("README.md").then((r) => r.text());
 document.querySelector("#README").innerHTML = marked.parse(content);
 
-const models = (await d3.csv("elo.csv")).filter((d) => d.cpmi);
-models.forEach((d) => {
-  d.cost = +d.cpmi;
-  d.elo = +d.elo;
-});
-// model.optimal = "best" if no model has higher ELO and lower cost
-// model.optimal = "worst" if no model has lower ELO and higher cost
-models.forEach((model) => {
-  let isBest = true;
-  let isWorst = true;
-  models.forEach((other) => {
-    if (model === other) return;
-    // If other model has higher ELO and lower cost, this model is not best
-    if (other.elo >= model.elo && other.cost <= model.cost) isBest = false;
-    // If other model has lower ELO and higher cost, this model is not worst
-    if (other.elo <= model.elo && other.cost >= model.cost) isWorst = false;
-  });
-  model.optimal = isBest ? "best" : isWorst ? "worst" : "";
-});
+// Load and process model data
+const models = (await d3.csv("elo.csv"))
+  .filter((d) => d.cpmi)
+  .map((d) => ({
+    ...d,
+    cost: +d.cpmi,
+    elo: +d.elo,
+  }));
 
-document.querySelector("#llm-cost").replaceChildren(
-  Plot.plot({
+const dates = Array.from(new Set(models.map((d) => d.launch))).sort();
+const $date = document.querySelector("#date");
+$date.setAttribute("max", dates.length - 1);
+$date.value = dates.length - 1;
+
+const xScale = d3
+  .scaleLog()
+  .domain(d3.extent(models, (d) => d.cost))
+  .range([0, 1000]);
+const yScale = d3
+  .scaleLinear()
+  .domain(d3.extent(models, (d) => d.elo))
+  .range([500, 0]);
+
+const updateOptimalStatus = (filteredModels) => {
+  filteredModels.forEach((model) => {
+    model.optimal = filteredModels.every(
+      (other) => other === model || other.elo <= model.elo || other.cost >= model.cost,
+    )
+      ? "best"
+      : filteredModels.every((other) => other === model || other.elo >= model.elo || other.cost <= model.cost)
+        ? "worst"
+        : "";
+  });
+};
+
+const renderPlot = (filteredModels) => {
+  const plot = Plot.plot({
     marginLeft: 50,
-    x: { type: "log", grid: true },
-    y: { grid: true },
+    x: { type: "log", grid: true, domain: xScale.domain() },
+    y: { grid: true, domain: yScale.domain() },
     width: 1000,
     height: 500,
     marks: [
-      Plot.dot(models, {
+      Plot.dot(filteredModels, {
         x: "cost",
         y: "elo",
         r: 8,
         fill: (d) =>
-          d.optimal == "best" ? "lime" : d.optimal == "worst" ? "red" : "rgba(var(--bs-body-color-rgb), 0.1)",
+          d.optimal === "best" ? "lime" : d.optimal === "worst" ? "red" : "rgba(var(--bs-body-color-rgb), 0.1)",
         stroke: "black",
         strokeWidth: 0.5,
         channels: { model: "model" },
@@ -48,13 +64,13 @@ document.querySelector("#llm-cost").replaceChildren(
           fill: "var(--bs-body-bg)",
           format: {
             fill: false,
-            x: (d) => `$${num(d)} / MTok`,
-            y: (d) => num0(d),
+            x: (d) => `$${num(d.cost)} / MTok`,
+            y: (d) => num0(d.elo),
           },
         },
       }),
       Plot.text(
-        models.filter((d) => d.optimal),
+        filteredModels.filter((d) => d.optimal),
         {
           x: "cost",
           y: "elo",
@@ -63,30 +79,34 @@ document.querySelector("#llm-cost").replaceChildren(
           lineAnchor: "bottom",
         },
       ),
-      Plot.axisX({
-        label: "Cost per million input tokens",
-      }),
-      Plot.axisY({
-        label: "ELO score",
-        tickSpacing: 100,
-      }),
+      Plot.axisX({ label: "Cost per million input tokens" }),
+      Plot.axisY({ label: "ELO score", tickSpacing: 100 }),
     ],
-  }),
-);
-
-const circles = document.querySelectorAll("#llm-cost circle");
-models.forEach((model, i) => (model.node = circles[i]));
-const modelNames = Object.fromEntries(models.map((d) => [d.model, d]));
-const texts = document.querySelectorAll('#llm-cost [aria-label="text"] text');
-
-document.querySelector("#model").addEventListener("input", (event) => {
-  const search = event.target.value.trim();
-  texts.forEach((text) => (text.style.opacity = search ? 0 : 1));
-  const results = fuzzysort.go(search, Object.keys(modelNames), { theshold: -20 });
-  const matches = new Set(results.map((r) => r.target));
-  models.forEach(({ model, node }) => {
-    const match = search ? matches.has(model) : true;
-    node.style.opacity = match ? 1 : 0;
-    node.style.pointerEvents = match ? "all" : "none";
   });
-});
+  document.querySelector("#llm-cost").replaceChildren(plot);
+
+  // Add nodes to models for search functionality
+  const circles = document.querySelectorAll("#llm-cost circle");
+  models.forEach((model, i) => (model.node = circles[i]));
+};
+
+const update = () => {
+  const date = dates[$date.value];
+  document.querySelector("#date-label").textContent = d3.timeFormat("%b %Y")(d3.timeParse("%Y-%m")(date));
+
+  const search = document.querySelector("#model").value.trim();
+  const results = fuzzysort.go(
+    search,
+    models.map((m) => m.model),
+    { threshold: -20 },
+  );
+  const matches = new Set(results.map((r) => r.target));
+
+  const filteredModels = models.filter((d) => d.launch <= date && (search ? matches.has(d.model) : true));
+  updateOptimalStatus(filteredModels);
+  renderPlot(filteredModels);
+};
+
+$date.addEventListener("input", update);
+document.querySelector("#model").addEventListener("input", update);
+update();

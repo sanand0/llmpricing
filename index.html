@@ -55,8 +55,10 @@
       <div class="col-md-6 col-lg-4 col-xl-3">
         <input id="model" class="form-control mb-3" placeholder="Filter models">
       </div>
-      <div class="col-md-6 col-lg-8 col-xl-9">
-        <div class="text-end mb-3">🟢 Best models 🔴 Worst models</div>
+      <div class="col-md-6 col-lg-8 col-xl-9 d-flex">
+        <label class="form-label text-nowrap me-3" id="date-label" for="date">Month</label>
+        <input type="range" id="date" class="form-range mb-3 me-3 flex-grow-1" min="0" max="100" step="1" value="100">
+        <div class="text-end text-nowrap mb-3">🟢 Best models 🔴 Worst models</div>
       </div>
     </div>
     <div id="llm-cost" class="img-fluid"></div>
