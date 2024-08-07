@@ -64,8 +64,8 @@ const renderPlot = (filteredModels) => {
           fill: "var(--bs-body-bg)",
           format: {
             fill: false,
-            x: (d) => `$${num(d.cost)} / MTok`,
-            y: (d) => num0(d.elo),
+            x: (d) => `$${num(d)} / MTok`,
+            y: (d) => num0(d),
           },
         },
       }),
