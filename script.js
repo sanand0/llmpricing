@@ -34,7 +34,7 @@ const yScale = d3
 const updateOptimalStatus = (filteredModels) => {
   filteredModels.forEach((model) => {
     model.optimal = filteredModels.every(
-      (other) => other === model || other.elo <= model.elo || other.cost >= model.cost,
+      (other) => other === model || other.elo <= model.elo || other.cost >= model.cost
     )
       ? "best"
       : filteredModels.every((other) => other === model || other.elo >= model.elo || other.cost <= model.cost)
@@ -77,7 +77,7 @@ const renderPlot = (filteredModels) => {
           text: (d) => d.model,
           dy: -10,
           lineAnchor: "bottom",
-        },
+        }
       ),
       Plot.axisX({ label: "Cost per million input tokens" }),
       Plot.axisY({ label: "ELO score", tickSpacing: 100 }),
@@ -98,7 +98,7 @@ const update = () => {
   const results = fuzzysort.go(
     search,
     models.map((m) => m.model),
-    { threshold: -20 },
+    { threshold: -20 }
   );
   const matches = new Set(results.map((r) => r.target));
 
