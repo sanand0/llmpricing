@@ -33,9 +33,7 @@ const yScale = d3
 
 const updateOptimalStatus = (filteredModels) => {
   filteredModels.forEach((model) => {
-    model.optimal = filteredModels.every(
-      (other) => other === model || other.elo <= model.elo || other.cost >= model.cost
-    )
+    model.optimal = filteredModels.every((other) => other === model || other.elo < model.elo || other.cost > model.cost)
       ? "best"
       : filteredModels.every((other) => other === model || other.elo >= model.elo || other.cost <= model.cost)
         ? "worst"
@@ -102,7 +100,9 @@ const update = () => {
   );
   const matches = new Set(results.map((r) => r.target));
 
-  const filteredModels = models.filter((d) => d.launch <= date && (search ? matches.has(d.model) : true));
+  const filteredModels = models.filter(
+    (d) => d.launch <= date && (d.end ? d.end > date : true) && (search ? matches.has(d.model) : true)
+  );
   updateOptimalStatus(filteredModels);
   renderPlot(filteredModels);
 };
