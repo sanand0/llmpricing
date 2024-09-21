@@ -1,7 +1,9 @@
 model,elo,cpmi,launch,end,source
-chatgpt-4o-latest,1317,5,2024-08,,https://openai.com/api/pricing/
-gpt-4o-2024-05-13,1286,5,2024-05,,https://openai.com/api/pricing/
-gpt-4o-mini-2024-07-18,1275,0.15,2024-07,,https://openai.com/api/pricing/
+o1-preview,1355,15,2024-09,,https://openai.com/api/pricing/
+chatgpt-4o-latest,1335,5,2024-08,,https://openai.com/api/pricing/
+o1-mini,1324,3,2024-09,,https://openai.com/api/pricing/
+gpt-4o-2024-05-13,1285,5,2024-05,,https://openai.com/api/pricing/
+gpt-4o-mini-2024-07-18,1273,0.15,2024-07,,https://openai.com/api/pricing/
 claude-3-5-sonnet-20240620,1271,3,2024-06,,
 gemini-advanced-0514,1266,,2024-05,,
 gpt-4o-2024-08-06,1262,2.5,2024-08,,https://openai.com/api/pricing/
