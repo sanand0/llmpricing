@@ -5,7 +5,9 @@ o1-mini,1309,3,2024-09,,https://openai.com/api/pricing/
 gemini-1.5-pro-002,1303,5,2024-10,,
 grok-2-08-13,1290,5,2024-09,,
 yi-lightning,1286,,2024-10,,
-gpt-4o-2024-05-13,1285,5,2024-05,,https://openai.com/api/pricing/
+gpt-4o-2024-05-13,1285,2.5,2024-09,,
+gpt-4o-2024-05-13,1285,5,2024-05,2024-09,https://openai.com/api/pricing/
+claude-3-5-sonnet-20241022,1283,3,2024-10,,
 glm-4-plus,1275,0.33,2024-10,,https://open.bigmodel.cn/pricing
 gpt-4o-mini-2024-07-18,1274,0.15,2024-07,,https://openai.com/api/pricing/
 gemini-1.5-flash-002,1271,0.075,2024-10,,
