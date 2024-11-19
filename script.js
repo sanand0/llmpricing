@@ -8,14 +8,12 @@ import { default as fuzzysort } from "https://cdn.jsdelivr.net/npm/fuzzysort@3/+
 const content = await fetch("README.md").then((r) => r.text());
 document.querySelector("#README").innerHTML = marked.parse(content);
 
+let quality = new URLSearchParams(window.location.search).get("quality") || "overall";
+document.querySelector("#quality").textContent = quality.charAt(0).toUpperCase() + quality.slice(1);
+
 // Load and process model data
-const models = (await d3.csv("elo.csv"))
-  .filter((d) => d.cpmi)
-  .map((d) => ({
-    ...d,
-    cost: +d.cpmi,
-    elo: +d.elo,
-  }));
+const data = await d3.csv("elo.csv");
+const models = data.filter((d) => d.cpmi).map((d) => ({ ...d, cost: +d.cpmi, elo: +d[quality] }));
 
 const dates = Array.from(new Set(models.map((d) => d.launch))).sort();
 const $date = document.querySelector("#date");
@@ -36,8 +34,8 @@ const updateOptimalStatus = (filteredModels) => {
     model.optimal = filteredModels.every((other) => other === model || other.elo < model.elo || other.cost > model.cost)
       ? "best"
       : filteredModels.every((other) => other === model || other.elo >= model.elo || other.cost <= model.cost)
-        ? "worst"
-        : "";
+      ? "worst"
+      : "";
   });
 };
 
