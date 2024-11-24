@@ -18,7 +18,7 @@ These are shown in green 🟢 and are the best LLMs to use.
 Some LLMs are "pareto suboptimal", i.e. there is no LLM worse in both cost and quality.
 These are shown in red 🔴 and are the LLMs to avoid.
 
-Last updated: **22 Nov 2024**
+Last updated: **24 Nov 2024**
 
 Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 
@@ -32,6 +32,6 @@ Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 - Copy the JSON from the event stream at `data?session_hash=...`
 - Format the data: event stream as JSON in VS Code
 - Extract the "data": array of arrays as a table via https://tools.s-anand.net/json2csv/
-- Update `elo.csv` via lookups
+- Update `elo.csv` via lookups with the STYLE CONTROLLED Elo scores
 
 -->
