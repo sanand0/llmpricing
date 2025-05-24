@@ -34,4 +34,11 @@ Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 - Extract the "data": array of arrays as a table via https://tools.s-anand.net/json2csv/
 - Update `elo.csv` via lookups with the STYLE CONTROLLED Elo scores
 
+# Billing rates
+
+Run `uv run billing.py` to get the per-hour output "billing rates" of LLMs in billing.json.
+
+Blog post: https://www.s-anand.net/blog/wage-rates-of-nations-and-llms/
+ChatGPT analysis: https://chatgpt.com/share/68317a06-0cac-800c-ad6f-13646ceb489f
+
 -->
