@@ -18,7 +18,7 @@ These are shown in green 🟢 and are the best LLMs to use.
 Some LLMs are "pareto suboptimal", i.e. there is no LLM worse in both cost and quality.
 These are shown in red 🔴 and are the LLMs to avoid.
 
-Last updated: **24 May 2025**
+Last updated: **11 Jun 2025**
 
 Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 
@@ -26,13 +26,13 @@ Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 
 # How to update
 
-- Visit <https://lmarena.ai/?leaderboard>
-- Click on "New: Overview"
-- Click on "Sort by Arena Score" button
-- Copy the JSON from the event stream at `data?session_hash=...`
-- Format the data: event stream as JSON in VS Code
-- Extract the "data": array of arrays as a table via https://tools.s-anand.net/json2csv/
-- Update `elo.csv` via lookups with the STYLE CONTROLLED Elo scores
+- Go to each of these pages
+  - https://lmarena.ai/leaderboard/text
+  - https://lmarena.ai/leaderboard/text/hard-prompts
+  - https://lmarena.ai/leaderboard/text/coding
+- Use the <https://tools.s-anand.net/page2md/> bookmarklet to get the page as Markdown
+- Paste at <https://tools.s-anand.net/md2csv/> and copy as CSV
+- Update `elo.csv` via lookups
 
 # Billing rates
 
