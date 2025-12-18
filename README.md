@@ -26,13 +26,25 @@ Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 
 # How to update
 
-- Go to each of these pages
-  - https://lmarena.ai/leaderboard/text
-  - https://lmarena.ai/leaderboard/text/hard-prompts
-  - https://lmarena.ai/leaderboard/text/coding
-- Use the <https://tools.s-anand.net/page2md/> bookmarklet to get the page as Markdown
-- Paste at <https://tools.s-anand.net/md2csv/> and copy as CSV
-- Update `elo.csv` via lookups
+Go to each of these pages:
+
+- https://lmarena.ai/leaderboard/text
+- https://lmarena.ai/leaderboard/text/hard-prompts
+- https://lmarena.ai/leaderboard/text/coding
+
+Paste this bookmarklet:
+
+```js
+copy($$("table tr").map(d => {
+  const cells = d.querySelectorAll("td, th");
+  const [model, score] = [cells[2].innerText, cells[3].innerText.split(/\s/)[0]];
+  return `${model}\t${score}`;
+}).join("\n"));
+```
+
+[Update the sheet](https://docs.google.com/spreadsheets/d/1K6ftVTjDxc-s1gY6cqUiUNa2kW4NjaVClr8__oIimTM/edit) via lookups.
+
+Download and save as elo.csv.
 
 # Billing rates
 
