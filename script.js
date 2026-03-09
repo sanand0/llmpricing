@@ -29,6 +29,18 @@ const yScale = d3
   .domain(d3.extent(models, (d) => d.elo))
   .range([500, 0]);
 
+// LMArena Elo mapped to academic milestones (Framework A)
+const eloAnnotations = [
+  { elo: 1000, label: "🧒 Middle schooler" },
+  { elo: 1100, label: "🎒 HS freshman" },
+  { elo: 1200, label: "🎓 HS graduate" },
+  { elo: 1300, label: "📚 College junior" },
+  { elo: 1350, label: "🏫 College grad" },
+  { elo: 1400, label: "🎓 Master's student" },
+  { elo: 1450, label: "🔬 PhD candidate" },
+  { elo: 1480, label: "🏛 Tenured professor" },
+];
+
 const updateOptimalStatus = (filteredModels) => {
   filteredModels.forEach((model) => {
     model.optimal = filteredModels.every((other) => other === model || other.elo < model.elo || other.cost > model.cost)
@@ -47,6 +59,22 @@ const renderPlot = (filteredModels) => {
     width: 1000,
     height: 500,
     marks: [
+      Plot.ruleY(eloAnnotations, {
+        y: "elo",
+        stroke: "#888",
+        strokeOpacity: 0.3,
+        strokeDasharray: "4,4",
+      }),
+      Plot.text(eloAnnotations, {
+        y: "elo",
+        text: "label",
+        frameAnchor: "right",
+        textAnchor: "end",
+        fontSize: 10,
+        fill: "#888",
+        dx: -4,
+        dy: -5,
+      }),
       Plot.dot(filteredModels, {
         x: "cost",
         y: "elo",
