@@ -18,7 +18,7 @@ These are shown in green 🟢 and are the best LLMs to use.
 Some LLMs are "pareto suboptimal", i.e. there is no LLM worse in both cost and quality.
 These are shown in red 🔴 and are the LLMs to avoid.
 
-Last updated: **08 Feb 2026**
+Last updated: **09 Mar 2026**
 
 Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 
@@ -37,7 +37,7 @@ Paste this bookmarklet:
 ```js
 copy($$("table tr").map(d => {
   const cells = d.querySelectorAll("td, th");
-  const [model, score] = [cells[2].innerText, cells[3].innerText.split(/\s/)[0]];
+  const [model, score] = [cells[2].querySelector("a")?.innerText ?? cells[2].innerText, cells[3].innerText.split(/\s/)[0]];
   return `${model}\t${score}`;
 }).join("\n"));
 ```
