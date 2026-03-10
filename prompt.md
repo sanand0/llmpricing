@@ -1,5 +1,72 @@
 # Prompts
 
+## Scrolly v2
+
+Add a scrollytelling narrative.
+
+Do not disturb the current screen. But when the user scrolls further down, below the chart, the scrollytelling should smoothly appear as glassmorphism or semi-transparent cards that occupy a small portion of the screen positioned horizontally so that they don't overlap too much of the important content in the chart (e.g. models to highlight), and not too tall and with plenty of gap between cards (half a screen, maybe) so that users can see the visual between the cards.
+
+Think about the effect this will have while people are reading, and aim for high engagement.
+
+As they scroll down, the cards and the month slider should smoothly move to the earliest month, and then animate month by month on scroll, and explaining the key events and insights in terms of model quality and pricing. Use the data story skill to do this effectively, narrating like Malcolm Gladwell, preserving the visual style of the page, using the education progression as a framework for measure of intelligence (read prompts.md for context). Highlight specific models to support the story.
+
+Begin by explaining the axes and the annotations on the right "HS freshman", etc. at the start of the story. Explain the X-axis - cost per million - intuitively, e.g. "That's roughly the cost to process all 7 volumes of Harry Potter or the King James Bible" (I think - but check this and give a good intuitive sense of the cost).
+
+Augment the story with authoritative external references, expert commentary, benchmarks, and critical insights. Link to these (opening in a new tab) as part of the story cards.
+
+Use the data story skill to explain the IMPLICATIONS (especially business implications) in a compelling way.
+
+Store the narrative text in a separate JSON file and read from it. This should control the entire narrative, including what month to jump to next, what models to highlight, what insights to share, and so on.
+
+Make edits incrementally to avoid large output (over 32K output tokens) that might fail.
+
+---
+
+I'd like the cards to scroll as the user scrolls.
+#chart-sticky can have a top of var(--navbar-height) + some gap.
+I'd like the circles to have the same size they originally did.
+MILDLY fade out the non-highlighted models and their labels (if any) so that the highlighted model is far more visually prominent, but the others are still visible and can be read if the user wants to.
+Make the content more scannable - just reading the stuff in bold should tell them the crux of the story.
+
+---
+
+The cards should be ABOVE the chart. Update z-index.
+Fact-check the contents of the cards CAREFULLY. Edit as required - ensuring high engagement and insight.
+Allow scrolling the last card as well, so that it vanishes on top too, with them seeing the final version of the chart with the models and being able to explore them.
+
+---
+
+Time the stories when all models in the story are visible. For example, we mention "Haigh: college-grad capability" when it is not visible.
+Keep in mind that this will be updated constantly - so avoid things that will need to be constantly updated, e.g. "how the world got there - in 27 months". Keep cards independent and timeless.
+
+---
+
+Too much in bold. The bold text should still convey the story, but with less in bold.
+
+---
+
+At the end of the story, allow the last card to scroll well past the top of the screen. Make sure I can see the entire chart, filters, etc. and all the models are visible and I can explore the visualization again after scrolling past the bottom.
+
+## Scrolly v1
+
+Add a scrollytelling narrative. So, when users first visit the page, they see roughly the same thing as now (but prettier). As they scroll down, the page should smoothly move to the earliest month, and then animate month by month on scroll, and explaining the key events and insights in terms of model quality and pricing. Use the data story skill to do this effectively, narrating like Malcolm Gladwell, with the visual style of The New York Times, using the education progression as a framework for measure of intelligence (read prompts.md for context). Store the narrative text in a separate JSON file and read from it. This should control the entire narrative, including what month to jump to next, what models to highlight, what insights to share, and so on.
+
+---
+
+Augment the story with authoritative external references, expert commentary, benchmarks, and critical insights. Link to these (opening in a new tab) as part of the story.
+
+---
+
+It should begin with the full page visual along with the dropdown to select Overall/Coding/Hard, the model search filter, the timeline slider, and legends. The user should begin by being able to explore the screen. Retain the original layout for that.
+
+THEN, when the user scrolls down, the scrollytelling should smoothly appear - while the dropdown, model search filter, timeline slider, etc. vanish. It can appear as glassmorphism or semi-transparent cards that occupy a third or quarter of the screen on the center, left, or right as specific models get highlighted. Allow some whitespace between the cards. Break the story up into smaller sections. Think about the effect this will have while people are reading, and aim for high engagement. If required, make it more concise for this.
+
+The other models are currently greyed out strongly - allow them a _bit_ more visibility.
+
+Highlight the annotations on the right "HS freshman", etc. at the start of the story and explain the Y axis. Also the X-axis - cost per million. That's roughly the cost to process all 7 volumes of Harry Potter or the King James Bible I think - but check this and give a good intuitive sense of the cost.
+
+Use the data story skill to explain the IMPLICATIONS (especially business implications) in a compelling way.
+
 ## Analogies
 
 Introduce annotations on the Y axis, ELO score, to show what the numbers mean in terms of model quality. Think about the best way to do this visually and apply it. It should not be too in-your-face but should be highly discoverable and intuitive.

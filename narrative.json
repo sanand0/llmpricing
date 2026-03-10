@@ -1,0 +1,187 @@
+{
+  "cards": [
+    {
+      "id": "orient",
+      "month": "2026-02",
+      "position": "right",
+      "vertical": "top",
+      "highlight": [],
+      "title": "How to read this chart",
+      "body": "<p>The vertical axis is intelligence — mapped to the academic ladder on the right. Elo 1100 is high school freshman; Elo 1480 is tenured professor. The horizontal axis is cost: one million input tokens — roughly the entire King James Bible — priced from two cents to $75. <strong>The upper-left corner is the dream: brilliant and cheap.</strong> This is the story of how the world got there.</p>",
+      "links": []
+    },
+    {
+      "id": "year-zero",
+      "month": "2023-03",
+      "position": "right",
+      "vertical": "bottom",
+      "highlight": [
+        "claude-1",
+        "gpt-3.5-turbo-0314"
+      ],
+      "title": "March 2023 — Year Zero",
+      "body": "<p>March 2023. The entire AI landscape fits in a small cluster near the bottom of the chart. GPT-3.5 and Claude 1 are the state of the art — high-school-to-college-freshman intelligence that writes a fluent paragraph, then confidently invents a fact. Processing the King James Bible costs 50 cents to $8. These models can hold a conversation. <strong>They cannot, reliably, hold an argument.</strong></p>",
+      "links": [
+        {
+          "text": "LMSYS Chatbot Arena launches (May 2023)",
+          "url": "https://lmsys.org/blog/2023-05-03-arena/"
+        }
+      ]
+    },
+    {
+      "id": "the-leap",
+      "month": "2023-11",
+      "position": "left",
+      "vertical": "top",
+      "highlight": [
+        "gpt-4-1106-preview"
+      ],
+      "title": "November 2023 — The Leap",
+      "body": "<p>November 6, 2023: GPT-4 Turbo. The chart jolts upward. Elo 1313 — college-junior level: coherent research papers, complex reasoning, output worth reading. <strong>Price: $10 per million tokens</strong> — about $14 to process all seven Harry Potter novels. Expensive, but for the first time the intelligence felt worth it. Enterprises stopped asking whether AI could help. They started asking how much they were willing to pay.</p>",
+      "links": [
+        {
+          "text": "OpenAI DevDay announcement",
+          "url": "https://openai.com/blog/new-models-and-developer-products-announced-at-devday"
+        }
+      ]
+    },
+    {
+      "id": "the-split",
+      "month": "2024-03",
+      "position": "right",
+      "vertical": "bottom",
+      "highlight": [
+        "claude-3-opus-20240229",
+        "claude-3-sonnet-20240229",
+        "claude-3-haiku-20240307"
+      ],
+      "title": "February 2024 — The Split",
+      "body": "<p>Early 2024: Anthropic launches Claude 3 in three tiers. Opus and Sonnet arrive February 29; Haiku a week later, March 7. Opus: entry-analyst capability at $15. Sonnet: similar quality at $3. Haiku: college-junior reasoning at $0.25. <strong>A 60× price spread — same company, same training philosophy.</strong> The intelligence market had learned to stratify, and every business began thinking in tiers.</p>",
+      "links": [
+        {
+          "text": "Anthropic Claude 3 announcement",
+          "url": "https://www.anthropic.com/news/claude-3-family"
+        }
+      ]
+    },
+    {
+      "id": "summer-pivot",
+      "month": "2024-06",
+      "position": "left",
+      "vertical": "top",
+      "highlight": [
+        "claude-3-5-sonnet-20240620",
+        "llama-3.1-405b-instruct-bf16"
+      ],
+      "title": "June 2024 — The Summer Pivot",
+      "body": "<p>June 2024 bent the economics permanently. Claude 3.5 Sonnet — strong manager level (Elo 1342) — arrived at $3 per million tokens: five times cheaper than Opus, four months later, at better quality. Meta’s Llama 3.1 405B matched it at $2, or free if self-hosted. Any CFO paying $15 for frontier AI could now pay $3. <strong>The question changed from “can we afford AI?” to “what are we waiting for?”</strong></p>",
+      "links": [
+        {
+          "text": "Claude 3.5 Sonnet launch",
+          "url": "https://www.anthropic.com/news/claude-3-5-sonnet"
+        },
+        {
+          "text": "Meta releases Llama 3.1",
+          "url": "https://ai.meta.com/blog/meta-llama-3-1/"
+        }
+      ]
+    },
+    {
+      "id": "thinking",
+      "month": "2024-09",
+      "position": "right",
+      "vertical": "top",
+      "highlight": [
+        "o1-preview"
+      ],
+      "title": "September 2024 — The Thinking Machine",
+      "body": "<p>September 2024: OpenAI o1. It didn’t just answer — it reasoned. Before responding, it ran an internal monologue: checking its own logic, catching its own errors. <strong>Elo 1388 — the biggest single-model quality jump since GPT-4.</strong> It scored at or above PhD-expert level on GPQA Diamond, a benchmark of graduate-level science questions. Price: $15. For the first time, AI felt less like autocomplete and more like a colleague you’d genuinely consult.</p>",
+      "links": [
+        {
+          "text": "OpenAI o1 system card",
+          "url": "https://openai.com/index/openai-o1-system-card/"
+        },
+        {
+          "text": "GPQA Diamond benchmark results",
+          "url": "https://arxiv.org/abs/2311.12022"
+        }
+      ]
+    },
+    {
+      "id": "earthquake",
+      "month": "2025-01",
+      "position": "left",
+      "vertical": "bottom",
+      "highlight": [
+        "deepseek-r1"
+      ],
+      "title": "January 2025 — The Earthquake",
+      "body": "<p>January 20, 2025. DeepSeek R1 matched o1-level reasoning (Elo 1398) at $0.55 per million tokens — <strong>a 27× discount.</strong> The announcement wiped $600 billion from Nvidia’s market cap in a single day. Silicon Valley assumed expensive compute was a moat. DeepSeek proved it was just a starting point. PhD-approaching reasoning for fifty-five cents per Bible.</p>",
+      "links": [
+        {
+          "text": "Reuters: DeepSeek wipes $600B from Nvidia",
+          "url": "https://www.reuters.com/technology/chinas-deepseek-sets-off-ai-market-rout-2025-01-27/"
+        },
+        {
+          "text": "DeepSeek R1 technical report",
+          "url": "https://arxiv.org/abs/2501.12948"
+        }
+      ]
+    },
+    {
+      "id": "race",
+      "month": "2025-06",
+      "position": "right",
+      "vertical": "top",
+      "highlight": [
+        "gemini-2.5-pro-preview-06-05",
+        "gemini-2.5-flash-lite-preview-06-17-thinking"
+      ],
+      "title": "Mid-2025 — The Race to the Top-Left",
+      "body": "<p>By mid-2025, the upper-left corner was filling fast. Gemini 2.5 Pro delivered tenured-professor intelligence (Elo 1476) at $1.25 per million tokens. Flash models handled most enterprise work for 30 cents. Companies that had rationed AI to critical workflows were now running it everywhere. <strong>The constraint was no longer cost or capability — it was imagination.</strong></p>",
+      "links": [
+        {
+          "text": "Google Gemini 2.5 Pro launch",
+          "url": "https://blog.google/technology/google-deepmind/gemini-model-updates-february-2025/"
+        }
+      ]
+    },
+    {
+      "id": "scholar",
+      "month": "2026-02",
+      "position": "left",
+      "vertical": "top",
+      "highlight": [
+        "claude-opus-4-6",
+        "gemini-3.1-pro-preview"
+      ],
+      "title": "February 2026 — Polymath Scholar",
+      "body": "<p>The top models in early 2026 score above 1500 Elo — polymath scholar territory. A 1500-rated model beats a 1300-rated one in 76% of head-to-head matchups. GPT-4 Turbo launched at college-junior level (Elo 1313) in November 2023. Twenty-seven months later, Claude Opus 4.6 and Gemini 3.1 Pro sit at 1500+. <strong>What cost $15 in 2024 is now beaten by models at one-seventh the price.</strong></p>",
+      "links": [
+        {
+          "text": "LMArena Leaderboard",
+          "url": "https://lmarena.ai/leaderboard"
+        }
+      ]
+    },
+    {
+      "id": "implications",
+      "month": "2026-02",
+      "position": "center",
+      "vertical": "top",
+      "highlight": [],
+      "title": "So What Does This Mean?",
+      "body": "<p>In 2023, reaching master’s-level AI for 100 analysts meant paying $30/MTok — roughly $135,000 a month. By 2026, models with higher capability cost $1–5/MTok: under $15,000 for better results. For most tasks — analysis, drafting, coding, research — models in the $1–3 range deliver more than enough. Save frontier models for your hardest problems. <strong>The question is no longer what AI costs. It’s what you would build if intelligence cost a dime per Bible.</strong></p>",
+      "links": [
+        {
+          "text": "McKinsey: The economic potential of generative AI",
+          "url": "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/the-economic-potential-of-generative-ai"
+        },
+        {
+          "text": "Sequoia: AI's $600B question",
+          "url": "https://www.sequoiacap.com/article/ais-600b-question/"
+        }
+      ]
+    }
+  ]
+}

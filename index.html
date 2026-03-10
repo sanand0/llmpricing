@@ -17,12 +17,116 @@
 
     body {
       padding-top: var(--navbar-height);
-      margin-bottom: 50vh;
     }
 
-    #llm-cost>svg {
+    #llm-cost > svg {
       width: 100%;
       height: auto;
+    }
+
+    /* Sticky chart area during scrollytelling */
+    #chart-sticky {
+      position: sticky;
+      top: calc(var(--navbar-height) + 0.75rem);
+      z-index: 40;
+      background: var(--bs-body-bg);
+      padding-bottom: 0.25rem;
+    }
+
+    /* Overlay container (kept for structure, no longer hosts cards) */
+    #chart-area {
+      position: relative;
+    }
+
+    /* Scrolly step — full-height trigger containing the sticky card */
+    .scrolly-step {
+      height: 85vh;
+      position: relative;
+    }
+
+    /* Gap between steps so the chart is visible between cards */
+    .scrolly-gap {
+      height: 40vh;
+    }
+
+    /* Glassmorphism scrolly card — sticky within its step */
+    .scrolly-card {
+      position: sticky;
+      z-index: 50;
+      top: calc(var(--navbar-height) + 0.75rem + 45vh);  /* lower half of chart */
+      max-width: 360px;
+      width: 38%;
+      min-width: 240px;
+      padding: 1.1rem 1.35rem 0.9rem;
+      border-radius: 14px;
+      backdrop-filter: blur(14px) saturate(1.6);
+      -webkit-backdrop-filter: blur(14px) saturate(1.6);
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(255, 255, 255, 0.3) inset;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+      /* left by default */
+      margin-right: auto;
+    }
+
+    .scrolly-card.vert-top {
+      top: calc(var(--navbar-height) + 0.75rem + 4rem);  /* upper quarter of chart */
+    }
+
+    .scrolly-card.pos-right {
+      margin-left: auto;
+      margin-right: 0;
+    }
+
+    .scrolly-card.pos-center {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    [data-bs-theme="dark"] .scrolly-card {
+      background: rgba(18, 18, 32, 0.72);
+      border-color: rgba(255, 255, 255, 0.13);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 1px 0px rgba(255, 255, 255, 0.06) inset;
+    }
+
+    .scrolly-card.is-active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .scrolly-card h6 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      opacity: 0.75;
+    }
+
+    .scrolly-card p {
+      margin-bottom: 0.55rem;
+    }
+
+    .scrolly-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .scrolly-card .card-links {
+      margin-top: 0.6rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .scrolly-card .card-links a {
+      font-size: 0.72rem;
+      opacity: 0.8;
+      text-decoration: underline;
+      text-underline-offset: 2px;
     }
   </style>
 </head>
@@ -49,27 +153,36 @@
     <h1 class="display-1 my-4 text-center">LLM Pricing</h1>
     <h2 class="display-6 text-center">Which LLMs are the best value for money?</h2>
     <div id="README" class="my-5 mx-auto" style="max-width: 30rem"></div>
-    <div class="row align-items-center mt-4">
-      <div class="col-lg-4 col-xl-3 d-flex">
-        <div class="dropdown mb-3">
-          <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="quality" data-bs-toggle="dropdown" aria-expanded="false">
-            Overall
-          </button>
-          <ul class="dropdown-menu">
-            <li><a href="?quality=overall" class="dropdown-item">Overall</a></li>
-            <li><a href="?quality=coding" class="dropdown-item">Coding</a></li>
-            <li><a href="?quality=hard" class="dropdown-item">Hard</a></li>
-          </ul>
+    <div id="chart-sticky">
+      <div class="row align-items-center mt-4">
+        <div class="col-lg-4 col-xl-3 d-flex">
+          <div class="dropdown mb-3">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="quality" data-bs-toggle="dropdown" aria-expanded="false">
+              Overall
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href="?quality=overall" class="dropdown-item">Overall</a></li>
+              <li><a href="?quality=coding" class="dropdown-item">Coding</a></li>
+              <li><a href="?quality=hard" class="dropdown-item">Hard</a></li>
+            </ul>
+          </div>
+          <input id="model" class="form-control mb-3 ms-2" placeholder="Filter models">
         </div>
-        <input id="model" class="form-control mb-3 ms-2" placeholder="Filter models">
+        <div class="col-lg-8 col-xl-9 d-flex">
+          <label class="form-label text-nowrap me-3" id="date-label" for="date">Month</label>
+          <input type="range" id="date" class="form-range mb-3 me-3 flex-grow-1" min="0" max="100" step="1" value="100">
+          <div class="text-end text-nowrap mb-3">🟢 Best models 🔴 Worst models</div>
+        </div>
       </div>
-      <div class="col-lg-8 col-xl-9 d-flex">
-        <label class="form-label text-nowrap me-3" id="date-label" for="date">Month</label>
-        <input type="range" id="date" class="form-range mb-3 me-3 flex-grow-1" min="0" max="100" step="1" value="100">
-        <div class="text-end text-nowrap mb-3">🟢 Best models 🔴 Worst models</div>
+      <div id="chart-area">
+        <div id="llm-cost" class="img-fluid"></div>
+        <!-- Scrolly card overlay injected by JS -->
       </div>
     </div>
-    <div id="llm-cost" class="img-fluid"></div>
+
+    <!-- Scrolly step triggers — generated by script.js -->
+    <div id="scrolly-section"></div>
+
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" type="module"></script>
