@@ -1,6 +1,58 @@
 # Prompts
 
+## Update Elo, 1 Apr 2026 (GitHub Copilot - GPT 5.4 xhigh)
+
+<!-- copilot --yolo --model gpt-5.4 --effort xhigh -->
+
+Write a Python script update_elo.py that can be run as:
+
+```bash
+uv run update_elo.py file.txt --column column
+```
+
+This should read file.txt as a TSV file. Ignore the header and treat the two columns as model and $column (e.g. if the CLI argument is `--column code` then the second column is `code`).
+
+If the model is present in elo.csv, update the corresponding $column value in elo.csv with the value from file.txt.
+If the model is not present in elo.csv, add a new row with the model and the $column value, and set the "launch" column to the previous month with a question mark (e.g. "2024-05?").
+Search for the pricing using OpenRouter's models endpoint (the model may be named differently in OpenRouter - see elo.csv to see if you can find a robust fuzzy match but avoid incorrect matches) and when you find a match, update the cpmi (cost per million tokens) column in elo.csv with the pricing information, as well as the "source" column.
+
+Run and test using `text.txt`, `hard.txt` and `code.txt` (which are named after the columns). Revert elo.csv to its original state to retest if needed.
+
+---
+
+If cpmi, launch, end, or source exist, do NOT update it.
+
+Insert new models just above the first model with $column value lower than the new model, so the file remains (roughly) sorted by $column.
+
+If a model is not present when the $column is "overall", and "end" is not present, set "end" to the current month with a question mark (e.g. "2024-06?").
+
+Run and test.
+
+---
+
+Find any opportunities to simplify the code, make it more elegant and maintainable.
+
+---
+
+If the model launch date can be inferred from openrouter, update it where it is missing.
+
+---
+
+If you get the launch date from OpenRouter, no need to add the ? after the date.
+
+---
+
+Modify the visualization to ignore any models with a missing ELO score (overall, coding, or hard).
+
+---
+
+In the visualization, the hover tooltip shows fillOpacity, strokeOpacity and strokeWidth. Remove these from the tooltip. cost, elo, and model are shown and should remain.
+
+<!-- copilot --resume=60cd6f58-38f7-4f45-b4a9-294e7ad04f18 -->
+
 ## Scrolly v2
+
+<!-- copilot --yolo --model claude-sonnet-4.6 --effort high -->
 
 Add a scrollytelling narrative.
 
@@ -47,7 +99,7 @@ Too much in bold. The bold text should still convey the story, but with less in 
 
 At the end of the story, allow the last card to scroll well past the top of the screen. Make sure I can see the entire chart, filters, etc. and all the models are visible and I can explore the visualization again after scrolling past the bottom.
 
-## Scrolly v1
+## Scrolly v1 (GitHub Copilot - Claude Sonnet 4.6 high)
 
 Add a scrollytelling narrative. So, when users first visit the page, they see roughly the same thing as now (but prettier). As they scroll down, the page should smoothly move to the earliest month, and then animate month by month on scroll, and explaining the key events and insights in terms of model quality and pricing. Use the data story skill to do this effectively, narrating like Malcolm Gladwell, with the visual style of The New York Times, using the education progression as a framework for measure of intelligence (read prompts.md for context). Store the narrative text in a separate JSON file and read from it. This should control the entire narrative, including what month to jump to next, what models to highlight, what insights to share, and so on.
 

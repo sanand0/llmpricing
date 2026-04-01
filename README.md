@@ -18,7 +18,7 @@ These are shown in green 🟢 and are the best LLMs to use.
 Some LLMs are "pareto suboptimal", i.e. there is no LLM worse in both cost and quality.
 These are shown in red 🔴 and are the LLMs to avoid.
 
-Last updated: **09 Mar 2026**
+Last updated: **01 Apr 2026**
 
 Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 
@@ -42,9 +42,11 @@ copy($$("table tr").map(d => {
 }).join("\n"));
 ```
 
-[Update the sheet](https://docs.google.com/spreadsheets/d/1K6ftVTjDxc-s1gY6cqUiUNa2kW4NjaVClr8__oIimTM/edit) via lookups.
+Save as file.txt and run:
 
-Download and save as elo.csv.
+```bash
+uv run update_elo.py file.txt --column [overall|coding|hard]
+```
 
 # Billing rates
 

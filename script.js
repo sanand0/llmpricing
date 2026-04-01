@@ -13,7 +13,11 @@ document.querySelector("#quality").textContent = quality.charAt(0).toUpperCase()
 
 // Load and process model data
 const data = await d3.csv("elo.csv");
-const models = data.filter((d) => d.cpmi).map((d) => ({ ...d, cost: +d.cpmi, elo: +d[quality] }));
+const eloFields = ["overall", "hard", "coding"];
+const hasEloScore = (row, field) => row[field]?.trim() !== "" && Number.isFinite(+row[field]);
+const models = data
+  .filter((d) => d.cpmi && eloFields.every((field) => hasEloScore(d, field)))
+  .map((d) => ({ ...d, cost: +d.cpmi, elo: +d[quality] }));
 
 // Scrollytelling state
 let scrollyHighlights = new Set();
@@ -100,6 +104,9 @@ const renderPlot = (filteredModels) => {
           fill: "var(--bs-body-bg)",
           format: {
             fill: false,
+            fillOpacity: false,
+            strokeOpacity: false,
+            strokeWidth: false,
             x: (d) => `$${num(d)} / MTok`,
             y: (d) => num0(d),
           },
