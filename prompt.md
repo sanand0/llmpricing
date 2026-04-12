@@ -48,6 +48,24 @@ Modify the visualization to ignore any models with a missing ELO score (overall,
 
 In the visualization, the hover tooltip shows fillOpacity, strokeOpacity and strokeWidth. Remove these from the tooltip. cost, elo, and model are shown and should remain.
 
+--- <!-- 12 Apr 2026, gpt-5.4 medium -->
+
+Currently, if a model is missing ANY ELO score (overall, coding, or hard), it is hidden in ALL views.
+Instead, change it so that if only coding is missing, it is hidden in the coding view, etc.
+
+---
+
+Now NOTHING is visible, i.e. no models!
+
+---
+
+Actually, normalizing quality URL aliases wasn't the problem, so I undid the change.
+
+The problem is that if the cpmi value is zero, script.js fails. So, make two changes, minimally.
+
+1. Modify script.js to ignore rows with cpmi of zero
+2. Modify update_elo.py to set a blank cpmi if the value is zero
+
 <!-- copilot --resume=60cd6f58-38f7-4f45-b4a9-294e7ad04f18 -->
 
 ## Scrolly v2

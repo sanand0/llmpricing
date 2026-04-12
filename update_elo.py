@@ -403,7 +403,8 @@ def update_openrouter_metadata(
 
     pricing_updated = False
     if not row["cpmi"]:
-        row["cpmi"] = format_decimal(match.prompt_price * TOKENS_PER_MILLION)
+        cpmi_value = match.prompt_price * TOKENS_PER_MILLION
+        row["cpmi"] = "" if cpmi_value <= 0 else format_decimal(cpmi_value)
         pricing_updated = True
     if not row["source"]:
         row["source"] = match.source_url
