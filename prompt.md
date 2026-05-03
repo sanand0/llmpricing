@@ -1,5 +1,23 @@
 # Prompts
 
+## Deprecations, 29 Apr 2026
+
+<!--
+cd /home/sanand/code/llmpricing
+dev.sh
+copilot --yolo --model gpt-5.4 --effort medium
+-->
+
+Update the "end" column in elo.csv with the deprecation/shutdown dates documented at:
+
+- https://developers.openai.com/api/docs/deprecations.md
+- https://platform.claude.com/docs/en/about-claude/model-deprecations.md
+- https://ai.google.dev/gemini-api/docs/deprecations
+
+Use sub-agents if required for token efficiency.
+
+<!-- copilot --resume="Update Elo CSV End Dates" --yolo -->
+
 ## Update Elo, 1 Apr 2026 (GitHub Copilot - GPT 5.4 xhigh)
 
 <!-- copilot --yolo --model gpt-5.4 --effort xhigh -->
