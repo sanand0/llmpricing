@@ -1,5 +1,53 @@
 # Prompts
 
+## Automate with CDP, 20 Jun 2026
+
+<!--
+cd /home/sanand/code/llmpricing
+dev.sh
+codex --yolo --model gpt-5.5 --config model_reasoning_effort=medium
+-->
+
+Create an agent-friendly `download.py` that can visit any of these pages via CDP on localhost:9222
+
+- https://lmarena.ai/leaderboard/text
+- https://lmarena.ai/leaderboard/text/hard-prompts
+- https://lmarena.ai/leaderboard/text/coding
+
+... and save the output of the following script:
+
+```js
+$$("table tr").map(d => {
+  const cells = d.querySelectorAll("td, th");
+  const [model, score] = [cells[2].querySelector("a")?.innerText ?? cells[2].innerText, cells[3].innerText.split(/\s/)[0]];
+  return `${model}\t${score}`;
+}).join("\n");
+```
+
+... as a temporary file, e.g. file.txt and run:
+
+```bash
+uv run update_elo.py file.txt --column [overall|coding|hard]
+```
+
+Write an `update.sh` that will run this entire flow for all three pages, and update the elo.csv file accordingly.
+
+Run and test.
+
+---
+
+Update README.md accordingly.
+
+---
+
+Do we need billing.py or is it redundant with update_elo.py?
+
+---
+
+Update README.md to mention that it worked when it was created (May 2025) but no longer works.
+
+<!-- codex resume 019ee49d-1681-7691-934f-0a66ad4f010f --yolo -->
+
 ## Deprecations, 29 Apr 2026
 
 <!--
