@@ -10,7 +10,7 @@ gpt-5.5-high,1481,1500,1519,5,2026-04,,https://openrouter.ai/openai/gpt-5.5
 claude-opus-4-8,1478,1512,1540,5,2026-05,2027-05-28,https://openrouter.ai/anthropic/claude-opus-4.8
 gemini-3.5-flash,1476,1491,1506,1.5,2026-05,,https://openrouter.ai/google/gemini-3.5-flash
 gpt-5.5,1475,1494,1504,5,2026-04,,https://openrouter.ai/openai/gpt-5.5
-qwen3.7-max-preview,1475,1495,1526,,2026-04?,,
+qwen3.7-max-preview,1475,1495,1526,1.25,2026-05,,https://openrouter.ai/qwen/qwen3.7-max
 glm-5.2 (max),1471,1497,1526,1.2,2026-06,,https://openrouter.ai/z-ai/glm-5.2
 ernie-5.1,1468,1488,1515,,2026-04?,,
 glm-5.1,1475,1499,1529,0.95,2026-04,,https://openrouter.ai/z-ai/glm-5.1
@@ -21,19 +21,19 @@ deepseek-v4-pro-thinking,1458,1478,1494,0.435,2026-04,,https://openrouter.ai/dee
 qwen3.6-max-preview,1461,1482,1509,1.04,2026-04,,https://openrouter.ai/qwen/qwen3.6-max-preview
 dola-seed-2.0-pro,1455,1479,1510,,2026-03?,,
 kimi-k2.6,1460,1486,1510,0.7448,2026-04,,https://openrouter.ai/moonshotai/kimi-k2.6
-gemma-4-31b,1451,1473,1497,,2026-03?,,
+gemma-4-31b,1451,1473,1497,0.12,2026-04,,https://openrouter.ai/google/gemma-4-31b-it
 minimax-m3,1448,1467,1505,0.3,2026-05,,https://openrouter.ai/minimax/minimax-m3
 grok-4.3,1444,1457,1487,1.25,2026-04,,https://openrouter.ai/x-ai/grok-4.3
 qwen3.6-plus,1444,1467,1493,0.325,2026-04,,https://openrouter.ai/qwen/qwen3.6-plus
 deepseek-v4-flash-thinking,1436,1456,1477,0.14,2026-04,,https://openrouter.ai/deepseek/deepseek-v4-flash
 longcat-flash-chat-2602-exp,1436,1459,1502,,2026-03?,,
-gemma-4-26b-a4b,1438,1461,1480,,2026-03?,,
+gemma-4-26b-a4b,1438,1461,1480,0.06,2026-04,,https://openrouter.ai/google/gemma-4-26b-a4b-it
 deepseek-v4-flash,1434,1457,1480,0.14,2026-04,,https://openrouter.ai/deepseek/deepseek-v4-flash
 mimo-v2.5,1433,1462,1490,0.4,2026-04,,https://openrouter.ai/xiaomi/mimo-v2.5
 mimo-v2-omni,1432,1458,1489,,2026-05?,,
 mistral-medium-3.5,1426,1444,1478,1.5,2026-04,,https://openrouter.ai/mistralai/mistral-medium-3-5
 nvidia-nemotron-3-ultra-550b-a55b-nvfp4,1416,1434,1465,,2026-05?,,
-hunyuan-hy3-preview,1413,1438,1459,,2026-04?,,
+hunyuan-hy3-preview,1413,1438,1459,0.063,2026-04,,https://openrouter.ai/tencent/hy3-preview
 trinity-large-preview,1379,1403,1441,0.15,2026-01,,https://openrouter.ai/arcee-ai/trinity-large-preview
 trinity-large-thinking,1369,1386,1414,0.22,2026-04,,https://openrouter.ai/arcee-ai/trinity-large-thinking
 granite-4.1-8b,1307,1323,1352,0.05,2026-04,,https://openrouter.ai/ibm-granite/granite-4.1-8b
@@ -49,7 +49,7 @@ gpt-5.2-codex,,,1336,1.75,2026-01,2026-07-23,https://openrouter.ai/openai/gpt-5.
 gpt-5.1-codex,,,1328,1.25,2025-11,2026-07-23,https://openrouter.ai/openai/gpt-5.1-codex
 KAT-Coder-Pro-V1,,,1257,,2026-03?,2026-04?,
 gpt-5.1-codex-mini,,,1238,0.25,2025-11,2026-07-23,https://openrouter.ai/openai/gpt-5.1-codex-mini
-devstral-2,,,1198,,2026-03?,2026-04?,
+devstral-2,,,1198,0.40,2025-09,,https://openrouter.ai/mistralai/devstral-2512
 grok-code-fast-1,,,1138,0.2,2025-08,2026-04?,https://openrouter.ai/x-ai/grok-code-fast-1
 devstral-medium-2507,,,1090,0.4,2025-07,2026-04?,https://openrouter.ai/mistralai/devstral-medium
 grok-4.20-multi-agent-beta-0309,1472,1486,1512,2,2026-03,,https://openrouter.ai/x-ai/grok-4.20-multi-agent
