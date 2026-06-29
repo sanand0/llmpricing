@@ -3,7 +3,7 @@
 The cost of LLMs is steadily falling, and the quality is rising.
 
 A rough estimate of the **cost of an LLM** is
-the cost per million tokens of input, mostly from [LLMPriceCheck](https://llmpricecheck.com/).
+the cost per million tokens of input, mostly from [OpenRouter](https://openrouter.ai/models).
 (Typically, inputs are the bigger component of the cost, compared to outputs.)
 
 A rough estimate of the **quality of an LLM** is
@@ -20,7 +20,9 @@ These are shown in red 🔴 and are the LLMs to avoid.
 
 Last updated: **24 Jun 2026**
 
-Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
+Alternatives:
+[ArtificialAnalysis.ai](https://artificialanalysis.ai/)
+[Gert Labs](https://gertlabs.com/rankings)
 
 <!--
 
