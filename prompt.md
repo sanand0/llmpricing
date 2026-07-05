@@ -1,5 +1,12 @@
 # Prompts
 
+## Update story
+
+<!--
+cd /home/sanand/code/llmpricing
+dev.sh -- codex --yolo --model gpt-5.5 --config model_reasoning_effort=medium exec 'Update narrative.json based on latest models.'
+-->
+
 ## Automate with CDP, 20 Jun 2026
 
 <!--
