@@ -22,7 +22,7 @@ app = typer.Typer(add_completion=False, no_args_is_help=True)
 EXTRACT_SCRIPT = r"""
 $$("table tr").map(d => {
   const cells = d.querySelectorAll("td, th");
-  const [model, score] = [cells[2].querySelector("a")?.innerText ?? cells[2].innerText, cells[3].innerText.split(/\s/)[0]];
+  const [model, score] = [(cells[2].querySelector("a")?.innerText ?? cells[2].innerText).split(/\n/)[0], cells[3].innerText.split(/\s/)[0]];
   return `${model}\t${score}`;
 }).join("\n");
 """.strip()

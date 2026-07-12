@@ -1,6 +1,17 @@
 # Prompts
 
-## Update story
+## Fix update, 12 Jul 2026
+
+<!--
+cd ~/code/llmpricing
+dev.sh -- codex --yolo --model gpt-5.6-sol --config model_reasoning_effort=medium
+-->
+
+Run update.sh and fix any issues you find. Document changes in notes.md - what changes did you make and why, and what should future maintainers be aware of.
+
+<!-- codex resume 019f558c-6777-7ba2-b247-195d6ab261bb --yolo -->
+
+## Update story, 05 Jul 2026
 
 <!--
 cd /home/sanand/code/llmpricing
