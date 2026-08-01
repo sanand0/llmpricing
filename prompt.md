@@ -1,5 +1,11 @@
 # Prompts
 
+## Intelligence cost curves, 01 Aug 2026
+
+Generated via ChatGPT + LocalMCP.
+
+<!-- https://chatgpt.com/c/6a6dcfa4-9b44-83ec-81a2-146de2f9b209 -->
+
 ## Screenshots, 01 Aug 2026
 
 <!--

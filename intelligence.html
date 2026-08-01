@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Pricing — Intelligence</title>
+  <meta name="description" content="The historical minimum input price of LLMs above seven labelled intelligence levels.">
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTUiIGZpbGw9IiMyNTYzZWIiLz48cGF0aCBmaWxsPSIjZmZmIiBkPSJtMTYgNyAyIDcgNyAyLTcgMi0yIDctMi03LTctMiA3LTJaIi8+PC9zdmc+" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" crossorigin="anonymous">
+  <style>
+    :root {
+      --navbar-height: 3.5rem;
+      --curve-0: #0d6efd;
+      --curve-1: #0dcaf0;
+      --curve-2: #198754;
+      --curve-3: #ffc107;
+      --curve-4: #fd7e14;
+      --curve-5: #dc3545;
+      --curve-6: #6f42c1;
+    }
+
+    [data-bs-theme="dark"] {
+      --curve-0: #6ea8fe;
+      --curve-1: #6edff6;
+      --curve-2: #75b798;
+      --curve-3: #ffda6a;
+      --curve-4: #feb272;
+      --curve-5: #ea868f;
+      --curve-6: #a98eda;
+    }
+
+    body {
+      padding-top: var(--navbar-height);
+    }
+
+    #intelligence-chart {
+      position: relative;
+      overflow-x: auto;
+    }
+
+    #intelligence-chart > svg {
+      display: block;
+      width: 100%;
+      min-width: 720px;
+      height: auto;
+      color: var(--bs-body-color);
+    }
+
+    .chart-grid line {
+      stroke: var(--bs-border-color);
+      stroke-opacity: 0.65;
+      shape-rendering: crispEdges;
+    }
+
+    .chart-axis path,
+    .chart-axis line {
+      stroke: var(--bs-border-color);
+    }
+
+    .chart-axis text,
+    .axis-label,
+    .curve-label {
+      fill: var(--bs-secondary-color);
+      font-family: var(--bs-font-monospace);
+      font-size: 11px;
+    }
+
+    .curve-line {
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      transition: opacity 120ms ease, stroke-width 120ms ease;
+    }
+
+    .curve-hit {
+      fill: none;
+      stroke: transparent;
+      stroke-width: 18;
+      cursor: crosshair;
+      pointer-events: stroke;
+    }
+
+    .curve-group.is-muted .curve-line,
+    .curve-group.is-muted .curve-label,
+    .curve-group.is-muted .label-connector {
+      opacity: 0.15;
+    }
+
+    .curve-group.is-active .curve-line {
+      stroke-width: 4;
+    }
+
+    .curve-label {
+      font-weight: 600;
+      dominant-baseline: middle;
+      paint-order: stroke;
+      stroke: var(--bs-body-bg);
+      stroke-width: 4px;
+      stroke-linejoin: round;
+    }
+
+    .label-connector {
+      fill: none;
+      stroke-width: 1;
+      stroke-opacity: 0.55;
+    }
+
+    .hover-dot {
+      stroke: var(--bs-body-bg);
+      stroke-width: 3;
+      pointer-events: none;
+    }
+
+    .chart-tooltip {
+      position: absolute;
+      z-index: 5;
+      display: none;
+      min-width: 190px;
+      max-width: 280px;
+      padding: 0.65rem 0.8rem;
+      color: var(--bs-body-color);
+      background: var(--bs-body-bg);
+      border: 1px solid var(--bs-border-color);
+      border-radius: var(--bs-border-radius);
+      box-shadow: var(--bs-box-shadow);
+      pointer-events: none;
+    }
+
+    .chart-tooltip.is-visible {
+      display: block;
+    }
+
+
+    .intelligence-filters {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      border: 1px solid var(--bs-border-color);
+      border-radius: var(--bs-border-radius);
+      overflow: hidden;
+    }
+
+    .intelligence-filter {
+      min-width: 0;
+      padding: 1rem;
+      color: var(--bs-body-color);
+      text-align: left;
+      background: var(--bs-body-bg);
+      border: 0;
+      border-right: 1px solid var(--bs-border-color);
+      transition: background-color 120ms ease, opacity 120ms ease, box-shadow 120ms ease;
+    }
+
+    .intelligence-filter:last-child {
+      border-right: 0;
+    }
+
+    .intelligence-filter:hover,
+    .intelligence-filter:focus-visible {
+      background: var(--bs-tertiary-bg);
+      outline: 0;
+    }
+
+    .intelligence-filter.is-selected {
+      position: relative;
+      z-index: 1;
+      background: var(--bs-tertiary-bg);
+      box-shadow: inset 0 0 0 2px var(--level-color);
+    }
+
+    .intelligence-filter.is-muted {
+      opacity: 0.42;
+    }
+
+    .intelligence-filter-swatch {
+      width: 1.5rem;
+      height: 0.2rem;
+      margin-bottom: 0.75rem;
+      border-radius: 999px;
+      background: var(--level-color);
+    }
+
+    .intelligence-filter-level {
+      min-height: 2.6em;
+      font-family: var(--bs-font-monospace);
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .intelligence-filter-threshold,
+    .intelligence-filter-fall,
+    .intelligence-filter-model {
+      color: var(--bs-secondary-color);
+      font-size: 0.75rem;
+      line-height: 1.35;
+    }
+
+    .intelligence-filter-cost {
+      margin-top: 0.55rem;
+      font-size: clamp(1.25rem, 2vw, 1.8rem);
+      font-weight: 600;
+      letter-spacing: -0.04em;
+    }
+
+    .intelligence-filter-model {
+      margin-top: 0.55rem;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 991.98px) {
+      .intelligence-filters {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .intelligence-filter {
+        border-right: 1px solid var(--bs-border-color);
+        border-bottom: 1px solid var(--bs-border-color);
+      }
+
+      .intelligence-filter:nth-child(2n) {
+        border-right: 0;
+      }
+
+      .intelligence-filter:last-child {
+        grid-column: 1 / -1;
+        border-bottom: 0;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .intelligence-filters {
+        grid-template-columns: 1fr;
+      }
+
+      .intelligence-filter,
+      .intelligence-filter:nth-child(2n) {
+        border-right: 0;
+        border-bottom: 1px solid var(--bs-border-color);
+      }
+
+      .intelligence-filter:last-child {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href=".">LLM Pricing</a>
+      <div class="position-absolute start-50 translate-middle-x">
+        <div class="btn-group btn-group-sm" role="group" aria-label="Pricing view">
+          <a class="btn btn-outline-secondary" href=".">Models</a>
+          <a class="btn btn-secondary active" aria-current="page" href="intelligence.html">Intelligence</a>
+        </div>
+      </div>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="nav-item dropdown ms-auto" role="group" aria-label="Toggle dark mode" title="Toggle Dark Mode">
+          <div class="ms-auto">
+            <div class="bootstrap-dark-theme"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1 class="display-1 my-4 text-center">LLM Pricing</h1>
+    <h2 class="display-6 text-center">How fast is the cost of intelligence falling?</h2>
+    <div class="my-5 mx-auto" style="max-width: 30rem">
+      <p>For each labelled intelligence level, this plots the lowest input price ever offered by a model with a higher overall Elo score.</p>
+      <p class="mb-0 text-body-secondary">Hover near a curve to inspect the model that set its price frontier at that point.</p>
+    </div>
+
+    <div id="intelligence-chart" class="img-fluid" role="region" aria-label="Historical price frontier by intelligence level"></div>
+    <div id="intelligence-filters" class="intelligence-filters mt-3" role="group" aria-label="Filter by intelligence level"></div>
+
+    <div class="my-5 mx-auto text-body-secondary" style="max-width: 42rem">
+      <p><strong class="text-body">Method.</strong> A model qualifies only when its overall Elo is strictly greater than the labelled threshold. Prices are dollars per million input tokens. Blank, zero, or invalid prices are excluded.</p>
+      <p><strong class="text-body">Caveat.</strong> The education labels are analogies for compressed LMArena Elo bands, not literal academic equivalence.</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" type="module"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-dark-theme@1.2/dist/dark-theme.js" type="module"></script>
+  <script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
+
+const levels = [
+  { threshold: 1100, label: "HS freshman" },
+  { threshold: 1200, label: "HS graduate" },
+  { threshold: 1300, label: "College junior" },
+  { threshold: 1350, label: "College grad" },
+  { threshold: 1400, label: "Master's student" },
+  { threshold: 1450, label: "PhD candidate" },
+  { threshold: 1480, label: "Tenured professor" },
+];
+
+const normalizeMonth = (value) => {
+  const match = String(value ?? "").match(/^(\d{4}-\d{2})/);
+  return match ? match[1] : null;
+};
+
+const raw = await d3.csv("elo.csv");
+const models = raw
+  .map((d) => ({
+    model: d.model?.trim(),
+    elo: Number(d.overall),
+    cost: Number(d.cpmi),
+    launch: normalizeMonth(d.launch),
+  }))
+  .filter((d) => d.model && d.launch && Number.isFinite(d.elo) && Number.isFinite(d.cost) && d.cost > 0);
+
+const monthFormat = d3.utcFormat("%Y-%m");
+const monthParse = d3.utcParse("%Y-%m");
+const shortMonth = d3.utcFormat("%b %y");
+const start = d3.min(models, (d) => monthParse(d.launch));
+const end = d3.max(models, (d) => monthParse(d.launch));
+const months = d3.utcMonth.range(start, d3.utcMonth.offset(end, 1)).map(monthFormat);
+
+const compareModels = (a, b) =>
+  d3.ascending(a.cost, b.cost) ||
+  d3.descending(a.elo, b.elo) ||
+  d3.ascending(a.model, b.model);
+
+const series = levels.map((level) => ({
+  ...level,
+  points: months.map((month) => {
+    const qualifying = models.filter((model) => model.launch <= month && model.elo > level.threshold);
+    const best = d3.least(qualifying, compareModels);
+    return best ? { ...best, month } : null;
+  }),
+}));
+
+const container = d3.select("#intelligence-chart");
+const filters = d3.select("#intelligence-filters");
+const width = 1000;
+const height = 540;
+const margin = { top: 30, right: 190, bottom: 65, left: 80 };
+const innerWidth = width - margin.left - margin.right;
+const innerHeight = height - margin.top - margin.bottom;
+
+const allCosts = series.flatMap((curve) => curve.points.filter(Boolean).map((point) => point.cost));
+const minCost = 10 ** Math.floor(Math.log10(d3.min(allCosts)));
+const maxCost = 10 ** Math.ceil(Math.log10(d3.max(allCosts)));
+
+const x = d3.scaleUtc()
+  .domain([start, end])
+  .range([margin.left, margin.left + innerWidth]);
+const y = d3.scaleLog()
+  .domain([minCost, maxCost])
+  .range([margin.top + innerHeight, margin.top]);
+
+const priceTicks = [];
+for (let power = Math.floor(Math.log10(minCost)); power <= Math.ceil(Math.log10(maxCost)); power += 1) {
+  for (const multiplier of [1, 2, 5]) {
+    const value = multiplier * 10 ** power;
+    if (value >= minCost && value <= maxCost) priceTicks.push(value);
+  }
+}
+
+const money = (value) => {
+  if (value < 0.01) return `$${value.toFixed(3)}`;
+  if (value < 0.1) return `$${value.toFixed(3).replace(/0+$/, "").replace(/\.$/, "")}`;
+  if (value < 1) return `$${value.toFixed(2).replace(/0+$/, "").replace(/\.$/, "")}`;
+  return `$${d3.format(",.3~g")(value)}`;
+};
+
+const firstPoint = (curve) => curve.points.find(Boolean);
+const lastPoint = (curve) => curve.points.findLast(Boolean);
+const color = (index) => `var(--curve-${index})`;
+const escapeHtml = (text) => String(text)
+  .replaceAll("&", "&amp;")
+  .replaceAll("<", "&lt;")
+  .replaceAll(">", "&gt;")
+  .replaceAll('"', "&quot;")
+  .replaceAll("'", "&#039;");
+
+const hashParams = new URLSearchParams(location.hash.slice(1));
+const levelParam = hashParams.get("level");
+const initialLevel = levelParam === null ? null : Number(levelParam);
+let selectedIndex = Number.isInteger(initialLevel) && initialLevel >= 0 && initialLevel < series.length
+  ? initialLevel
+  : null;
+
+const svg = container.append("svg")
+  .attr("viewBox", `0 0 ${width} ${height}`)
+  .attr("role", "img")
+  .attr("aria-labelledby", "intelligence-chart-title intelligence-chart-desc");
+
+svg.append("title")
+  .attr("id", "intelligence-chart-title")
+  .text("Historical minimum LLM price above seven intelligence levels");
+svg.append("desc")
+  .attr("id", "intelligence-chart-desc")
+  .text("Seven descending step lines show the cheapest input price ever achieved by models above each overall Elo threshold.");
+
+svg.append("g")
+  .attr("class", "chart-grid")
+  .attr("transform", `translate(${margin.left},0)`)
+  .call(d3.axisLeft(y).tickValues(priceTicks).tickSize(-innerWidth).tickFormat(""))
+  .call((g) => g.select(".domain").remove());
+
+svg.append("g")
+  .attr("class", "chart-axis")
+  .attr("transform", `translate(${margin.left},0)`)
+  .call(d3.axisLeft(y).tickValues(priceTicks).tickFormat(money));
+
+svg.append("g")
+  .attr("class", "chart-axis")
+  .attr("transform", `translate(0,${margin.top + innerHeight})`)
+  .call(d3.axisBottom(x).ticks(d3.utcYear.every(1)).tickFormat(d3.utcFormat("%b %Y")));
+
+svg.append("text")
+  .attr("class", "axis-label")
+  .attr("x", margin.left + innerWidth / 2)
+  .attr("y", height - 14)
+  .attr("text-anchor", "middle")
+  .text("Model launch month");
+
+svg.append("text")
+  .attr("class", "axis-label")
+  .attr("transform", `translate(17,${margin.top + innerHeight / 2}) rotate(-90)`)
+  .attr("text-anchor", "middle")
+  .text("Lowest input cost · $ per million tokens · log scale");
+
+const stepLine = d3.line()
+  .defined(Boolean)
+  .x((d) => x(monthParse(d.month)))
+  .y((d) => y(d.cost))
+  .curve(d3.curveStepAfter);
+
+const finalLabels = series
+  .map((curve, index) => {
+    const point = lastPoint(curve);
+    return { index, point, targetY: y(point.cost), y: y(point.cost) };
+  })
+  .sort((a, b) => d3.ascending(a.targetY, b.targetY));
+
+const minGap = 19;
+for (let i = 1; i < finalLabels.length; i += 1) {
+  finalLabels[i].y = Math.max(finalLabels[i].targetY, finalLabels[i - 1].y + minGap);
+}
+const overflow = finalLabels.at(-1).y - (margin.top + innerHeight);
+if (overflow > 0) finalLabels.forEach((label) => { label.y -= overflow; });
+for (let i = finalLabels.length - 2; i >= 0; i -= 1) {
+  finalLabels[i].y = Math.min(finalLabels[i].y, finalLabels[i + 1].y - minGap);
+}
+const labelY = new Map(finalLabels.map((label) => [label.index, label.y]));
+
+const tooltip = container.append("div")
+  .attr("class", "chart-tooltip")
+  .attr("role", "status")
+  .attr("aria-live", "polite");
+
+const hoverDot = svg.append("circle")
+  .attr("class", "hover-dot")
+  .attr("r", 5)
+  .style("display", "none");
+
+const groups = svg.selectAll(".curve-group")
+  .data(series.map((curve, index) => ({ ...curve, index })))
+  .join("g")
+  .attr("class", "curve-group");
+
+const updateSelection = (index) => {
+  selectedIndex = selectedIndex === index ? null : index;
+  const params = new URLSearchParams();
+  if (selectedIndex !== null) params.set("level", selectedIndex);
+  history.replaceState(null, "", params.size ? `#${params}` : location.pathname + location.search);
+  applyFocus();
+};
+
+const cards = filters.selectAll("button")
+  .data(series.map((curve, index) => ({ ...curve, index })))
+  .join("button")
+  .attr("type", "button")
+  .attr("class", "intelligence-filter")
+  .style("--level-color", (d) => color(d.index))
+  .attr("aria-label", (d) => `Filter to ${d.label}, Elo above ${d.threshold}`)
+  .on("click", (_, curve) => updateSelection(curve.index));
+
+cards.each(function(curve) {
+  const first = firstPoint(curve);
+  const latest = lastPoint(curve);
+  const factor = first.cost / latest.cost;
+  d3.select(this).html(`
+    <div class="intelligence-filter-swatch"></div>
+    <div class="intelligence-filter-level">${escapeHtml(curve.label)}</div>
+    <div class="intelligence-filter-threshold">Elo &gt; ${curve.threshold}</div>
+    <div class="intelligence-filter-cost">${money(latest.cost)}</div>
+    <div class="intelligence-filter-fall">${d3.format(",.3~g")(factor)}× cheaper since ${shortMonth(monthParse(first.month))}</div>
+    <div class="intelligence-filter-model">${escapeHtml(latest.model)}</div>
+  `);
+});
+
+function applyFocus(temporaryIndex = null) {
+  const activeIndex = temporaryIndex ?? selectedIndex;
+  groups
+    .classed("is-muted", (d) => activeIndex !== null && d.index !== activeIndex)
+    .classed("is-active", (d) => activeIndex !== null && d.index === activeIndex);
+  cards
+    .classed("is-selected", (d) => selectedIndex !== null && d.index === selectedIndex)
+    .classed("is-muted", (d) => selectedIndex !== null && d.index !== selectedIndex)
+    .attr("aria-pressed", (d) => String(selectedIndex !== null && d.index === selectedIndex));
+}
+
+const showTooltip = (event, curve) => {
+  const [pointerX] = d3.pointer(event, svg.node());
+  const date = x.invert(Math.max(margin.left, Math.min(margin.left + innerWidth, pointerX)));
+  let index = Math.round(d3.utcMonth.count(start, d3.utcMonth.floor(date)));
+  index = Math.max(0, Math.min(months.length - 1, index));
+
+  let point = curve.points[index];
+  if (!point) {
+    const candidates = curve.points
+      .map((candidate, candidateIndex) => ({ candidate, candidateIndex }))
+      .filter(({ candidate }) => candidate);
+    const nearest = d3.least(candidates, ({ candidateIndex }) => Math.abs(candidateIndex - index));
+    point = nearest?.candidate;
+    index = nearest?.candidateIndex ?? index;
+  }
+  if (!point) return;
+
+  applyFocus(curve.index);
+
+  hoverDot
+    .attr("cx", x(monthParse(months[index])))
+    .attr("cy", y(point.cost))
+    .attr("fill", color(curve.index))
+    .style("display", null);
+
+  tooltip.html(`
+    <div class="fw-semibold text-break">${escapeHtml(point.model)}</div>
+    <div>${money(point.cost)} / MTok</div>
+    <div>Elo ${Math.round(point.elo)}</div>
+  `);
+
+  const [clientX, clientY] = d3.pointer(event, container.node());
+  const node = tooltip.node();
+  tooltip.classed("is-visible", true);
+  const tooltipWidth = node.offsetWidth;
+  const tooltipHeight = node.offsetHeight;
+  const left = Math.min(container.node().clientWidth - tooltipWidth - 8, clientX + 14);
+  const top = Math.max(8, clientY - tooltipHeight - 12);
+  tooltip.style("left", `${Math.max(8, left)}px`).style("top", `${top}px`);
+};
+
+const hideTooltip = () => {
+  applyFocus();
+  hoverDot.style("display", "none");
+  tooltip.classed("is-visible", false);
+};
+
+groups.each(function(curve) {
+  const group = d3.select(this);
+  const pathData = stepLine(curve.points);
+
+  group.append("path")
+    .attr("class", "curve-line")
+    .attr("d", pathData)
+    .attr("stroke", color(curve.index));
+
+  group.append("path")
+    .attr("class", "curve-hit")
+    .attr("d", pathData)
+    .on("pointerenter pointermove", (event) => showTooltip(event, curve))
+    .on("pointerleave", hideTooltip)
+    .on("click", () => updateSelection(curve.index));
+
+  const latest = lastPoint(curve);
+  const endX = x(monthParse(latest.month));
+  const endY = y(latest.cost);
+  const textY = labelY.get(curve.index);
+
+  group.append("path")
+    .attr("class", "label-connector")
+    .attr("stroke", color(curve.index))
+    .attr("d", `M${endX + 3},${endY} L${margin.left + innerWidth + 14},${textY}`);
+
+  group.append("text")
+    .attr("class", "curve-label")
+    .attr("x", margin.left + innerWidth + 20)
+    .attr("y", textY)
+    .attr("fill", color(curve.index))
+    .style("cursor", "pointer")
+    .text(`${curve.label}  ${money(latest.cost)}`)
+    .on("click", () => updateSelection(curve.index));
+});
+
+container.on("pointerleave", hideTooltip);
+applyFocus();
+  </script>
+</body>
+
+</html>
