@@ -1,5 +1,26 @@
 # Prompts
 
+## Screenshots, 01 Aug 2026
+
+<!--
+cd ~/code/llmpricing
+dev.sh -- codex --yolo --model gpt-5.6-sol --config model_reasoning_effort=medium
+-->
+
+Capture the evolution of models as screenshots.
+
+https://sanand0.github.io/llmpricing/ has a `div#chart-sticky` that shows a chart of LLM pricing and capability. `input#model` acts as a filter for the model. `input#date` acts as a filter for the date (from min=0 to max=38 currently but may change).
+
+Write and run an agent-friendly CLI we can execute as `uv run screenshot.py --model gpt,gemini,...` to:
+
+- Open `https://sanand0.github.io/llmpricing/` in a headless browser
+- Apply `#model` = "gpt" as a filter, and for each `#date` from min to max
+- Take a screenshot of the entire `#chart-sticky` AFTER the chart has finished rendering
+- Save it as `screenshots/<model>-<date>.png` where `<model>` is the value of `#model` and `<date>` is the value of `#date` to 3 digits (e.g. `gpt-038.png`)
+- Repeat for `#model` = "gemini" and so on
+
+It should skip screenshots that exist unless `--force` is passed.
+
 ## Fix update, 12 Jul 2026
 
 <!--

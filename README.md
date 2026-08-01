@@ -69,4 +69,18 @@ update flow.
 Blog post: https://www.s-anand.net/blog/wage-rates-of-nations-and-llms/
 ChatGPT analysis: https://chatgpt.com/share/68317a06-0cac-800c-ad6f-13646ceb489f
 
+# Screenshots
+
+Create or update screenshots of the charts with:
+
+```bash
+uv run screenshots.py --model gpt,gemini,claude [--force]
+```
+
+Create videos with:
+
+```bash
+ffmpeg -framerate 2 -i screenshots/gpt-%03d.png -c:v libvpx-vp9 -pix_fmt yuva420p screenshots/gpt.webm
+```
+
 -->
