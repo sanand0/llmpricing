@@ -11,7 +11,7 @@ muse-spark-1.1,1487,1509,1532,1.25,2026-06,,https://openrouter.ai/meta/muse-spar
 claude-opus-5-max,1488,1512,1527,5,2026-07,,https://openrouter.ai/anthropic/claude-opus-5
 muse-spark,1488,1505,1526,,2026-07,1.25,https://openrouter.ai/meta/muse-spark-1.1
 kimi-k3-max,1485,1515,1542,,2026-07,2.80,https://openrouter.ai/moonshotai/kimi-k3
-gpt-5.6-sol-xhigh,1482,1504,1525,5,,,https://openrouter.ai/openai/gpt-5.6-sol
+gpt-5.6-sol-xhigh,1482,1504,1525,5,2026-07,,https://openrouter.ai/openai/gpt-5.6-sol
 kimi-k3,1486,1505,1531,3,2026-07,,https://openrouter.ai/moonshotai/kimi-k3
 gemini-3.6-flash,1485,1503,1524,1.5,2026-07,,https://openrouter.ai/google/gemini-3.6-flash
 claude-opus-4-8-thinking,1483,1513,1535,5,2026-05,2027-05-28,https://openrouter.ai/anthropic/claude-opus-4.8
@@ -28,7 +28,7 @@ glm-5.2-max,1471,1489,1507,,,,
 ernie-5.1,1467,1487,1514,,,,
 glm-5.1,1468,1491,1517,0.95,2026-04,,https://openrouter.ai/z-ai/glm-5.1
 gpt-5.5-instant,1474,1491,1515,,2026-04,5,https://openrouter.ai/openai/gpt-5.5
-gpt-5.6-terra-xhigh,1467,1489,1521,,2026-02,1,https://openrouter.ai/openai/gpt-5.6-terra
+gpt-5.6-terra-xhigh,1467,1489,1521,,2026-07,1,https://openrouter.ai/openai/gpt-5.6-terra
 mimo-v2.5-pro,1467,1495,1519,1,2026-04,,https://openrouter.ai/xiaomi/mimo-v2.5-pro
 claude-sonnet-5-thinking,1464,1492,1515,2,2026-06,,https://openrouter.ai/anthropic/claude-sonnet-5
 claude-sonnet-5-high,1463,1491,1525,2,2026-06,,https://openrouter.ai/anthropic/claude-sonnet-5
@@ -42,7 +42,7 @@ dola-seed-2.0-pro,1456,1480,1513,,,,
 kimi-k2.6,1461,1485,1515,0.7448,2026-04,,https://openrouter.ai/moonshotai/kimi-k2.6
 deepseek-v4-pro-high-preview,1456,1474,1489,,,,
 gemma-4-31b,1451,1473,1498,0.12,2026-04,,https://openrouter.ai/google/gemma-4-31b-it
-gpt-5.6-luna-xhigh,1450,1471,1498,,,,
+gpt-5.6-luna-xhigh,1450,1471,1498,0.1,2026-07,,https://openrouter.ai/openai/gpt-5.6-luna
 minimax-m3,1445,1466,1499,0.3,2026-05,,https://openrouter.ai/minimax/minimax-m3
 grok-4.3,1442,1456,1488,1.25,2026-04,,https://openrouter.ai/x-ai/grok-4.3
 qwen3.6-plus,1443,1467,1495,0.325,2026-04,,https://openrouter.ai/qwen/qwen3.6-plus
