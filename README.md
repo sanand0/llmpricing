@@ -29,10 +29,12 @@ Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 Start a browser with Chrome DevTools Protocol available at `localhost:9222`, then run:
 
 ```bash
-./update.sh
+just build
 ```
 
 This downloads all three LMArena leaderboards to temporary TSV files and updates `elo.csv`:
+
+Run `just push` to stage all changes, commit them as `Update models`, and push.
 
 - https://lmarena.ai/leaderboard/text
 - https://lmarena.ai/leaderboard/text/hard-prompts

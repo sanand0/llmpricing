@@ -1,5 +1,41 @@
 # Prompts
 
+## Update expiry dates, storyline, 30 Aug 2026
+
+Generated via ChatGPT + LocalMCP.
+
+<!-- https://chatgpt.com/c/6a939594-0b80-83ec-8bb0-dcc8533bf26f -->
+
+## UI Fix, 30 Aug 2026
+
+<!--
+cd ~/code/llmpricing
+dev.sh -- codex --yolo --model gpt-5.6-luna --config model_reasoning_effort=medium
+-->
+
+In the scatterplot, I don't think claude-opus-4.6-thinking is green. It has a cost of $5 and an elo of 1,505 and I think it's pareto optimal model - which are colored green. But this doesn't look to be so.
+Maybe I'm mistaken. There are several models at $5 that overlap and it's hard to read.
+So do this anyway - make sure the most recent models are displayed above.
+Also, check if there's an error in the pareto optimal calculation. If so, fix it.
+
+<!-- codex resume 01a05073-ca12-7502-b74f-00a189b017f9 --yolo -->
+
+## Update refresh, 30 Aug 2026
+
+<!--
+cd ~/code/llmpricing
+dev.sh -- codex --yolo --model gpt-5.6-sol --config model_reasoning_effort=high
+-->
+
+Running `update.sh` has two problems.
+
+1. It adds expiry dates that are wrong. For example, today's run added several `2026-08?` entries that I removed.
+2. It missed https://openrouter.ai/z-ai/glm-5.3-flash and https://openrouter.ai/z-ai/glm-5.3 on OpenRouter - probably more.
+
+Fix these. Check and double-check exploring different models to see if the numbers are actually correct, and revise as required.
+
+<!-- codex resume 01a0505e-e4bb-7b13-8f5a-c5c32cb63a78 --yolo -->
+
 ## Intelligence cost curves, 01 Aug 2026
 
 Generated via ChatGPT + LocalMCP.

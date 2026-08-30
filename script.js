@@ -3,6 +3,7 @@ import { marked } from "https://cdn.jsdelivr.net/npm/marked@12/+esm";
 import * as Plot from "https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6/+esm";
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm";
 import { default as fuzzysort } from "https://cdn.jsdelivr.net/npm/fuzzysort@3/+esm";
+import { paretoStatus } from "./pareto.js";
 
 // Load and display README content
 const content = await fetch("README.md").then((r) => r.text());
@@ -49,16 +50,12 @@ const eloAnnotations = [
 ];
 
 const updateOptimalStatus = (filteredModels) => {
-  filteredModels.forEach((model) => {
-    model.optimal = filteredModels.every((other) => other === model || other.elo < model.elo || other.cost > model.cost)
-      ? "best"
-      : filteredModels.every((other) => other === model || other.elo >= model.elo || other.cost <= model.cost)
-      ? "worst"
-      : "";
-  });
+  paretoStatus(filteredModels).forEach(({ model, status }) => (model.optimal = status));
 };
 
 const renderPlot = (filteredModels) => {
+  // Paint older points first so newer models remain visible when points overlap.
+  const orderedModels = [...filteredModels].sort((a, b) => d3.ascending(a.launch, b.launch));
   const plot = Plot.plot({
     marginLeft: 50,
     x: { type: "log", grid: true, domain: xScale.domain() },
@@ -82,7 +79,7 @@ const renderPlot = (filteredModels) => {
         dx: -4,
         dy: -5,
       }),
-      Plot.dot(filteredModels, {
+      Plot.dot(orderedModels, {
         x: "cost",
         y: "elo",
         r: 8,
@@ -112,7 +109,7 @@ const renderPlot = (filteredModels) => {
         },
       }),
       Plot.text(
-        filteredModels.filter((d) => d.optimal || scrollyHighlights.has(d.model)),
+        orderedModels.filter((d) => d.optimal || scrollyHighlights.has(d.model)),
         {
           x: "cost",
           y: "elo",
@@ -131,7 +128,7 @@ const renderPlot = (filteredModels) => {
 
   // Add nodes to models for search functionality
   const circles = document.querySelectorAll("#llm-cost circle");
-  models.forEach((model, i) => (model.node = circles[i]));
+  orderedModels.forEach((model, i) => (model.node = circles[i]));
 };
 
 const update = () => {

@@ -27,7 +27,22 @@
   conservative, unambiguous model-name match. This run intentionally left 114
   overall/hard models and 109 coding models unmatched rather than guessing prices or
   launch dates.
-- An overall update marks previously active models missing from the current overall
+- [SUPERSEDED] An overall update marks previously active models missing from the current overall
   leaderboard with an approximate end month. Newly seen models without OpenRouter
   launch metadata receive the previous month with a `?`; review these approximate
   dates when authoritative model information becomes available.
+
+# Update notes — 30 Aug 2026
+
+- `cpmi` uses the current lowest price in OpenRouter's Standard endpoint list. Flex,
+  Fast, Priority, and Batch service tiers are excluded so the value matches the
+  headline price on the model page.
+- The updater never infers an end date from a model being absent from one leaderboard
+  snapshot. Newly seen models without OpenRouter launch metadata receive the previous
+  month with a `?`; review these approximate launch dates when authoritative model
+  information becomes available.
+- Nonblank `end` values must be exact `YYYY-MM-DD` calendar dates; malformed or
+  approximate expiry values fail validation instead of silently entering `elo.csv`.
+- OpenRouter `expiration_date` now fills a blank `end` for conservatively matched
+  models. Existing end dates are never overwritten, and far-future sentinel dates
+  such as `2098-12-31` are treated as "no expiry announced."

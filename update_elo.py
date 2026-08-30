@@ -11,9 +11,11 @@ from __future__ import annotations
 import csv
 import re
 from collections import defaultdict, deque
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal, InvalidOperation
+from functools import cache
 from pathlib import Path
 
 import httpx
@@ -28,15 +30,19 @@ COLUMN_ALIASES = {
     "code": "coding",
     "coding": "coding",
 }
+MODEL_ALIASES = {"muse-glimmer": "muse-glimmer-30b"}
 
 PAREN_SUFFIX = re.compile(r"\s*\([^)]*\)\s*$")
 LATEST_SUFFIX = re.compile(r"-latest$", re.IGNORECASE)
-EFFORT_SUFFIX = re.compile(r"-(?:high|medium|low)$", re.IGNORECASE)
+EFFORT_SUFFIX = re.compile(r"-(?:xhigh|max|high|medium|low)$", re.IGNORECASE)
 REASONING_SUFFIX = re.compile(
     r"-(?:thinking|reasoning|no-thinking|non-thinking)$",
     re.IGNORECASE,
 )
 BETA_SUFFIX = re.compile(r"-beta(?:-\d+|\d+)?$", re.IGNORECASE)
+PREVIEW_SUFFIX = re.compile(r"-preview$", re.IGNORECASE)
+QUANTIZATION_SUFFIX = re.compile(r"-(?:bf16|fp8|nvfp4)$", re.IGNORECASE)
+END_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 RELEASE_SUFFIXES = (
     re.compile(r"-(?:20\d{2}(?:[-.]\d{2}){1,2})$"),
     re.compile(r"-(?:\d{2}(?:[-.]\d{2}){2})$"),
@@ -45,6 +51,7 @@ RELEASE_SUFFIXES = (
 )
 
 TOKENS_PER_MILLION = Decimal("1000000")
+NON_STANDARD_ENDPOINT_TIERS = {"batch", "fast", "flex", "priority"}
 type EloRow = dict[str, str]
 
 
@@ -60,7 +67,6 @@ class UpdateSummary:
     updated: int = 0
     priced: int = 0
     launched: int = 0
-    ended: int = 0
     unmatched_openrouter: list[str] = field(default_factory=list)
 
 
@@ -72,6 +78,7 @@ class OpenRouterModel:
     canonical_slug: str
     prompt_price: Decimal
     launch_label: str | None
+    end_label: str | None
 
     @property
     def source_url(self) -> str:
@@ -127,6 +134,14 @@ def drop_beta_suffix(value: str) -> str:
     return BETA_SUFFIX.sub("", value).strip("- ")
 
 
+def drop_preview_suffix(value: str) -> str:
+    return PREVIEW_SUFFIX.sub("", value).strip("- ")
+
+
+def drop_quantization_suffix(value: str) -> str:
+    return QUANTIZATION_SUFFIX.sub("", value).strip("- ")
+
+
 def drop_release_suffix(value: str) -> str:
     trimmed = value
     for pattern in RELEASE_SUFFIXES:
@@ -140,6 +155,8 @@ TRANSFORMS = (
     drop_reasoning_suffix,
     drop_effort_suffix,
     drop_beta_suffix,
+    drop_preview_suffix,
+    drop_quantization_suffix,
     drop_release_suffix,
 )
 
@@ -147,7 +164,10 @@ TRANSFORMS = (
 def generate_candidate_keys(model_name: str) -> list[str]:
     """Generate progressively looser exact-match aliases for an input model name."""
 
-    queue = deque([model_name.strip()])
+    initial = model_name.strip()
+    queue = deque([initial])
+    if alias := MODEL_ALIASES.get(normalize_key(initial)):
+        queue.append(alias)
     seen_values: set[str] = set()
     ordered_keys: list[str] = []
     seen_keys: set[str] = set()
@@ -195,9 +215,9 @@ class OpenRouterMatcher:
         if len(unique_hits) == 1:
             return unique_hits[0]
 
-        paid_hits = [hit for hit in unique_hits if not hit.model_id.endswith(":free")]
-        if len(paid_hits) == 1:
-            return paid_hits[0]
+        base_hits = [hit for hit in unique_hits if ":" not in hit.model_id]
+        if len(base_hits) == 1:
+            return base_hits[0]
         return None
 
 
@@ -252,6 +272,21 @@ def read_updates(tsv_path: Path) -> dict[str, str]:
     return updates
 
 
+def validate_end_dates(rows: list[EloRow], *, context: str) -> None:
+    """Require every nonblank model end date to be an exact ISO calendar date."""
+
+    for row in rows:
+        value = row["end"]
+        if not value:
+            continue
+        try:
+            valid = bool(END_DATE.fullmatch(value)) and date.fromisoformat(value).isoformat() == value
+        except ValueError:
+            valid = False
+        if not valid:
+            raise UpdateEloError(f"{context} model {row['model']!r} has invalid end date {value!r}.")
+
+
 def read_elo_rows(elo_path: Path) -> tuple[list[str], list[EloRow]]:
     """Load `elo.csv` while preserving header order."""
 
@@ -260,7 +295,21 @@ def read_elo_rows(elo_path: Path) -> tuple[list[str], list[EloRow]]:
         if not reader.fieldnames:
             raise UpdateEloError(f"{elo_path} is missing a header row.")
         rows = [{key: (value or "") for key, value in row.items()} for row in reader]
+    validate_end_dates(rows, context=str(elo_path))
     return reader.fieldnames, rows
+
+
+def infer_openrouter_end_label(expiration_date: object) -> str | None:
+    """Return a real OpenRouter expiry date, ignoring far-future no-expiry sentinels."""
+
+    value = str(expiration_date or "")
+    if not END_DATE.fullmatch(value):
+        return None
+    try:
+        expiry = date.fromisoformat(value)
+    except ValueError:
+        return None
+    return value if expiry.year < 2090 else None
 
 
 def fetch_openrouter_models() -> list[OpenRouterModel]:
@@ -289,9 +338,52 @@ def fetch_openrouter_models() -> list[OpenRouterModel]:
                 canonical_slug=str(item.get("canonical_slug") or ""),
                 prompt_price=price,
                 launch_label=infer_openrouter_launch_label(item.get("created")),
+                end_label=infer_openrouter_end_label(item.get("expiration_date")),
             )
         )
     return models
+
+
+def lowest_prompt_price(payload: object) -> Decimal:
+    """Return the lowest valid input-token price from an endpoints response."""
+
+    if not isinstance(payload, dict):
+        raise UpdateEloError("OpenRouter returned an unexpected endpoints payload.")
+    data = payload.get("data")
+    if not isinstance(data, dict) or not isinstance(data.get("endpoints"), list):
+        raise UpdateEloError("OpenRouter returned an unexpected endpoints payload.")
+
+    prices: list[Decimal] = []
+    for endpoint in data["endpoints"]:
+        if not isinstance(endpoint, dict):
+            continue
+        tag = str(endpoint.get("tag") or "")
+        if tag.rsplit("/", 1)[-1] in NON_STANDARD_ENDPOINT_TIERS:
+            continue
+        pricing = endpoint.get("pricing")
+        if not isinstance(pricing, dict):
+            continue
+        try:
+            price = Decimal(str(pricing.get("prompt")))
+        except InvalidOperation:
+            continue
+        if price >= 0:
+            prices.append(price)
+
+    if not prices:
+        raise UpdateEloError("OpenRouter returned no valid endpoint input prices.")
+    return min(prices)
+
+
+@cache
+def fetch_openrouter_prompt_price(model: OpenRouterModel) -> Decimal:
+    """Fetch the current lowest input price displayed on a model's OpenRouter page."""
+
+    slug = model.canonical_slug or model.model_id.split(":", 1)[0]
+    url = f"https://openrouter.ai/api/v1/models/{slug}/endpoints"
+    response = httpx.get(url, timeout=30.0)
+    response.raise_for_status()
+    return lowest_prompt_price(response.json())
 
 
 def format_decimal(value: Decimal) -> str:
@@ -386,6 +478,7 @@ def update_openrouter_metadata(
     *,
     model_name: str,
     matcher: OpenRouterMatcher,
+    prompt_price: Callable[[OpenRouterModel], Decimal] | None = None,
 ) -> OpenRouterUpdateResult:
     """Fill blank OpenRouter-backed metadata for a row.
 
@@ -394,16 +487,18 @@ def update_openrouter_metadata(
 
     needs_pricing = not row["cpmi"] or not row["source"]
     needs_launch = not row["launch"]
-    if not needs_pricing and not needs_launch:
+    needs_end = not row["end"]
+    if not needs_pricing and not needs_launch and not needs_end:
         return OpenRouterUpdateResult()
 
     match = matcher.match(model_name)
     if match is None:
-        return OpenRouterUpdateResult(missing_match=True)
+        return OpenRouterUpdateResult(missing_match=needs_pricing or needs_launch)
 
     pricing_updated = False
     if not row["cpmi"]:
-        cpmi_value = match.prompt_price * TOKENS_PER_MILLION
+        resolved_price = prompt_price(match) if prompt_price else match.prompt_price
+        cpmi_value = resolved_price * TOKENS_PER_MILLION
         row["cpmi"] = "" if cpmi_value <= 0 else format_decimal(cpmi_value)
         pricing_updated = True
     if not row["source"]:
@@ -414,23 +509,13 @@ def update_openrouter_metadata(
     if not row["launch"] and match.launch_label:
         row["launch"] = match.launch_label
         launch_updated = True
+    if not row["end"] and match.end_label:
+        row["end"] = match.end_label
 
     return OpenRouterUpdateResult(
         pricing_updated=pricing_updated,
         launch_updated=launch_updated,
     )
-
-
-def fill_missing_end_dates(rows: list[EloRow], present_models: set[str], *, end_label: str) -> int:
-    """Mark models missing from an overall TSV as ended when they have no end date yet."""
-
-    filled = 0
-    for row in rows:
-        if row["model"] in present_models or row["end"]:
-            continue
-        row["end"] = end_label
-        filled += 1
-    return filled
 
 
 def apply_updates(
@@ -441,6 +526,7 @@ def apply_updates(
     updates: dict[str, str],
     matcher: OpenRouterMatcher,
     now: datetime,
+    prompt_price: Callable[[OpenRouterModel], Decimal] | None = None,
 ) -> UpdateSummary:
     """Apply TSV scores and metadata updates to in-memory CSV rows."""
 
@@ -461,7 +547,12 @@ def apply_updates(
 
         row[target_column] = score
 
-        metadata_update = update_openrouter_metadata(row, model_name=model_name, matcher=matcher)
+        metadata_update = update_openrouter_metadata(
+            row,
+            model_name=model_name,
+            matcher=matcher,
+            prompt_price=prompt_price,
+        )
         if metadata_update.missing_match:
             summary.unmatched_openrouter.append(model_name)
         if metadata_update.pricing_updated:
@@ -473,9 +564,6 @@ def apply_updates(
 
     for row in new_rows:
         insert_row_by_score(rows, row, target_column=target_column)
-
-    if target_column == "overall":
-        summary.ended = fill_missing_end_dates(rows, set(updates), end_label=month_label(now))
 
     return summary
 
@@ -499,8 +587,6 @@ def print_summary(
     typer.echo(f"Updated pricing metadata for {summary.priced} touched models from OpenRouter.")
     if summary.launched:
         typer.echo(f"Updated launch dates for {summary.launched} touched models from OpenRouter.")
-    if summary.ended:
-        typer.echo(f"Filled blank end dates for {summary.ended} rows missing from the overall TSV.")
     if summary.unmatched_openrouter:
         preview = ", ".join(summary.unmatched_openrouter[:10])
         if len(summary.unmatched_openrouter) > 10:
@@ -513,6 +599,7 @@ def print_summary(
 def write_rows(elo_path: Path, headers: list[str], rows: list[EloRow]) -> None:
     """Write the updated CSV back to disk."""
 
+    validate_end_dates(rows, context=str(elo_path))
     with elo_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=headers)
         writer.writeheader()
@@ -556,22 +643,22 @@ def main(
         target_column = resolve_column(column, headers)
         updates = read_updates(file_path)
         matcher = OpenRouterMatcher(fetch_openrouter_models())
+        now = datetime.now(UTC)
+        summary = apply_updates(
+            headers,
+            rows,
+            target_column=target_column,
+            updates=updates,
+            matcher=matcher,
+            now=now,
+            prompt_price=fetch_openrouter_prompt_price,
+        )
     except UpdateEloError as exc:
         typer.echo(f"Error: {exc}", err=True)
         raise typer.Exit(code=1) from exc
     except httpx.HTTPError as exc:
         typer.echo(f"Error: failed to fetch OpenRouter models: {exc}", err=True)
         raise typer.Exit(code=1) from exc
-
-    now = datetime.now(UTC)
-    summary = apply_updates(
-        headers,
-        rows,
-        target_column=target_column,
-        updates=updates,
-        matcher=matcher,
-        now=now,
-    )
 
     if not dry_run:
         write_rows(elo_path, headers, rows)

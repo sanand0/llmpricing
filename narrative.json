@@ -2,7 +2,7 @@
   "cards": [
     {
       "id": "orient",
-      "month": "2026-06",
+      "month": "2026-08",
       "position": "right",
       "vertical": "top",
       "highlight": [],
@@ -16,12 +16,17 @@
       "position": "right",
       "vertical": "bottom",
       "highlight": [
+        "gpt-3.5-turbo-0314",
         "claude-1",
-        "gpt-3.5-turbo-0314"
+        "gpt-4-0314"
       ],
       "title": "March 2023 — Year Zero",
-      "body": "<p>March 2023. The entire AI landscape fits in a small cluster near the bottom of the chart. GPT-3.5 and Claude 1 are the state of the art — high-school-to-college-freshman intelligence that writes a fluent paragraph, then confidently invents a fact. Processing the King James Bible costs 50 cents to $8. These models can hold a conversation. <strong>They cannot, reliably, hold an argument.</strong></p>",
+      "body": "<p>March 2023 begins with GPT-3.5 and Claude 1 near the bottom of the chart. Then GPT-4 arrives on March 14 at Elo 1287 — far above Claude 1 at 1158 and GPT-3.5 at 1141 — but at $30 per million input tokens. <strong>Capability had arrived. Affordability had not.</strong></p>",
       "links": [
+        {
+          "text": "OpenAI introduces GPT-4",
+          "url": "https://openai.com/index/gpt-4-research/"
+        },
         {
           "text": "LMSYS Chatbot Arena launches (May 2023)",
           "url": "https://lmsys.org/blog/2023-05-03-arena/"
@@ -36,8 +41,8 @@
       "highlight": [
         "gpt-4-1106-preview"
       ],
-      "title": "November 2023 — The Leap",
-      "body": "<p>November 6, 2023: GPT-4 Turbo. The chart jolts upward. Elo 1313 — college-junior level: coherent research papers, complex reasoning, output worth reading. <strong>Price: $10 per million tokens</strong> — about $14 to process all seven Harry Potter novels. Expensive, but for the first time the intelligence felt worth it. Enterprises stopped asking whether AI could help. They started asking how much they were willing to pay.</p>",
+      "title": "November 2023 — The First Price Collapse",
+      "body": "<p>November 6, 2023: GPT-4 Turbo reaches Elo 1312, only 25 points above the original GPT-4 — while input price falls from $30 to $10 per million tokens. <strong>More capability for one-third the price.</strong> A pattern that will repeat for the next three years has begun: the frontier moves up and left at the same time.</p>",
       "links": [
         {
           "text": "OpenAI DevDay announcement",
@@ -55,8 +60,8 @@
         "claude-3-sonnet-20240229",
         "claude-3-haiku-20240307"
       ],
-      "title": "February 2024 — The Split",
-      "body": "<p>Early 2024: Anthropic launches Claude 3 in three tiers. Opus and Sonnet arrive February 29; Haiku a week later, March 7. Opus: entry-analyst capability at $15. Sonnet: similar quality at $3. Haiku: college-junior reasoning at $0.25. <strong>A 60× price spread — same company, same training philosophy.</strong> The intelligence market had learned to stratify, and every business began thinking in tiers.</p>",
+      "title": "March 2024 — The Split",
+      "body": "<p>March 2024: Anthropic launches Claude 3 in three tiers. Opus and Sonnet arrive March 4; Haiku follows March 13. On this chart, Opus scores Elo 1322 at $15, Sonnet 1281 at $3, and Haiku 1261 at $0.25. <strong>A 60× price spread — same company, same model family.</strong> The intelligence market had learned to stratify, and every business began thinking in tiers.</p>",
       "links": [
         {
           "text": "Anthropic Claude 3 announcement",
@@ -66,15 +71,15 @@
     },
     {
       "id": "summer-pivot",
-      "month": "2024-06",
+      "month": "2024-07",
       "position": "left",
       "vertical": "top",
       "highlight": [
         "claude-3-5-sonnet-20240620",
         "llama-3.1-405b-instruct-bf16"
       ],
-      "title": "June 2024 — The Summer Pivot",
-      "body": "<p>June 2024 bent the economics permanently. Claude 3.5 Sonnet — strong manager level (Elo 1342) — arrived at $3 per million tokens: five times cheaper than Opus, four months later, at better quality. Meta’s Llama 3.1 405B matched it at $2, or free if self-hosted. Any CFO paying $15 for frontier AI could now pay $3. <strong>The question changed from “can we afford AI?” to “what are we waiting for?”</strong></p>",
+      "title": "Summer 2024 — The Pivot",
+      "body": "<p>Summer 2024 bends the economics again. Claude 3.5 Sonnet arrives June 20 at Elo 1343 for $3 per million tokens — five times cheaper than Claude 3 Opus, with better quality. Meta follows on July 23 with Llama 3.1 405B, scoring Elo 1335 at $2 on this chart, with weights available to self-host. <strong>The question changes from “can we afford AI?” to “what are we waiting for?”</strong></p>",
       "links": [
         {
           "text": "Claude 3.5 Sonnet launch",
@@ -135,10 +140,10 @@
       "vertical": "top",
       "highlight": [
         "gemini-2.5-pro-preview-06-05",
-        "gemini-2.5-flash-lite-preview-06-17-thinking"
+        "gemini-2.5-flash-preview-05-20"
       ],
       "title": "Mid-2025 — The Race to the Top-Left",
-      "body": "<p>By mid-2025, the upper-left corner was filling fast. Gemini 2.5 Pro delivered tenured-professor intelligence (Elo 1476) at $1.25 per million tokens. Flash models handled most enterprise work for 30 cents. Companies that had rationed AI to critical workflows were now running it everywhere. <strong>The constraint was no longer cost or capability — it was imagination.</strong></p>",
+      "body": "<p>By mid-2025, the upper-left corner is filling fast. Gemini 2.5 Pro reaches Elo 1476 at $1.25 per million tokens. Gemini 2.5 Flash Preview reaches Elo 1420 for just 15 cents — another point on the same price-quality frontier. <strong>The frontier is no longer just moving up. It is moving left.</strong></p>",
       "links": [
         {
           "text": "Google Gemini 2.5 Pro launch",
@@ -175,31 +180,57 @@
       "vertical": "top",
       "highlight": [
         "claude-fable-5",
-        "claude-sonnet-5-thinking",
-        "glm-5.2 (max)",
-        "qwen3.7-plus"
+        "muse-spark-1.1",
+        "glm-5.2-max",
+        "gemma-4-31b"
       ],
-      "title": "June 2026 — The Agentic Split",
-      "body": "<p>June 2026 splits the market again. Claude Fable 5 takes the top of the chart at Elo 1509, but at $10 it is priced like a specialist. Claude Sonnet 5 Thinking lands lower on raw Elo at $2 introductory pricing, while GLM 5.2 Max and Qwen 3.7 Plus push strong frontier-adjacent scores near the $1 and sub-dollar bands. The pattern is clearer than the leaderboard: <strong>use the ceiling model for the hardest unresolved work; route everything else to the cheapest model that reliably finishes.</strong></p>",
+      "title": "June 2026 — The Routing Ladder",
+      "body": "<p>By June 2026, the price-quality frontier looks like a routing table. Claude Fable 5 sits at Elo 1507 for $10. Muse Spark 1.1 reaches 1490 for $1.25. GLM 5.2 Max reaches 1472 for about $0.33, and Gemma 4 31B reaches 1451 for $0.12. <strong>Every step down buys a large price cut for a small capability trade-off.</strong> The operational question is no longer “which model is best?” but “which is the cheapest model that reliably finishes this task?”</p>",
       "links": [
         {
           "text": "Anthropic: Claude Fable 5 and Mythos 5",
           "url": "https://www.anthropic.com/news/claude-fable-5-mythos-5"
         },
         {
-          "text": "Anthropic: Claude Sonnet 5",
-          "url": "https://www.anthropic.com/news/claude-sonnet-5"
+          "text": "OpenRouter: Muse Spark 1.1",
+          "url": "https://openrouter.ai/meta/muse-spark-1.1"
+        },
+        {
+          "text": "OpenRouter: GLM 5.2",
+          "url": "https://openrouter.ai/z-ai/glm-5.2"
+        }
+      ]
+    },
+    {
+      "id": "cheap-frontier",
+      "month": "2026-08",
+      "position": "left",
+      "vertical": "bottom",
+      "highlight": [
+        "muse-spark-1.2 (xHigh)",
+        "glm-5.3-flash"
+      ],
+      "title": "August 2026 — Seven-and-a-Half Cents",
+      "body": "<p>August 2026 makes the price gap hard to ignore. GLM 5.3 Flash reaches Elo 1469 for just 7.5 cents per million input tokens — only 38 Elo points below the $10 leader, Claude Fable 5, at roughly <strong>one-133rd the price.</strong> On coding, GLM Flash scores 1531 versus Fable’s 1551. Meanwhile Muse Spark 1.2 reaches Elo 1498 for $1.25 and sits on the overall price-quality frontier. The frontier is no longer one model. It is a menu. <strong>Paying for the best model by default is now an architectural mistake.</strong></p>",
+      "links": [
+        {
+          "text": "OpenRouter: GLM 5.3 Flash",
+          "url": "https://openrouter.ai/z-ai/glm-5.3-flash"
+        },
+        {
+          "text": "OpenRouter: Muse Spark 1.2",
+          "url": "https://openrouter.ai/meta/muse-spark-1.2"
         }
       ]
     },
     {
       "id": "implications",
-      "month": "2026-06",
+      "month": "2026-08",
       "position": "center",
       "vertical": "top",
       "highlight": [],
       "title": "So What Does This Mean?",
-      "body": "<p>In 2023, reaching master’s-level AI for 100 analysts meant paying $30/MTok — roughly $135,000 a month. By mid-2026, many models above the old frontier sit between $1 and $5/MTok, and some credible challengers are cheaper still. The new operating discipline is portfolio management: fast cheap models for drafts and routing, mid-tier models for most analysis and coding, top models for judgment-heavy dead ends. <strong>The question is no longer whether intelligence is affordable. It is whether your workflows know when to spend it.</strong></p>",
+      "body": "<p>In 2023, reaching master’s-level AI for 100 analysts meant paying $30/MTok — roughly $135,000 a month. By August 2026, credible near-frontier models range from $10 down to seven and a half cents per million tokens. The new operating discipline is portfolio management: fast cheap models for drafts, routing, and increasingly serious coding; mid-tier models for most analysis; top models for the stubborn judgment-heavy cases. <strong>The question is no longer whether intelligence is affordable. It is whether your workflows know when not to overpay for it.</strong></p>",
       "links": [
         {
           "text": "McKinsey: The economic potential of generative AI",
