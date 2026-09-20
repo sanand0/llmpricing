@@ -68,12 +68,12 @@ qwen3.8-27b,1437,1459,1499,0.4,2026-08,,https://openrouter.ai/qwen/qwen3.8-27b
 deepseek-v4-flash-high-preview,1438,1458,1479,0.0679,2026-04,,https://openrouter.ai/deepseek/deepseek-v4-flash
 glm-5v-turbo,1433,1452,1489,1.2,2026-04,,https://openrouter.ai/z-ai/glm-5v-turbo
 deepseek-v4-flash-thinking,1439,1460,1481,0.14,2026-04,,https://openrouter.ai/deepseek/deepseek-v4-flash
-longcat-flash-chat-2602-exp,1435,1460,1503,,2026-03?,,
+longcat-flash-chat-2602-exp,1435,1460,1503,,,,
 gemma-4-26b-a4b,1438,1462,1481,0.06,2026-04,,https://openrouter.ai/google/gemma-4-26b-a4b-it
 deepseek-v4-flash,1436,1459,1483,0.14,2026-04,,https://openrouter.ai/deepseek/deepseek-v4-flash
 mimo-v2.5,1434,1462,1491,0.4,2026-04,,https://openrouter.ai/xiaomi/mimo-v2.5
 inkling-small,1431,,,0.5,2026-07,,https://openrouter.ai/thinkingmachines/inkling-small
-mimo-v2-omni,1430,1457,1486,,2026-05?,,
+mimo-v2-omni,1430,1457,1486,,,,
 mistral-medium-3.5,1426,1445,1479,1.5,2026-04,,https://openrouter.ai/mistralai/mistral-medium-3-5
 nvidia-nemotron-3-ultra-550b-a55b-nvfp4,1426,1443,1474,0.5,2026-06,,https://openrouter.ai/nvidia/nemotron-3-ultra-550b-a55b
 muse-glimmer,1427,1445,1483,0.3,2026-08,,https://openrouter.ai/meta/muse-glimmer-30b
@@ -83,9 +83,9 @@ trinity-large-preview,1378,1404,1442,0.15,2026-01,,https://openrouter.ai/arcee-a
 solar-pro4,1376,1405,1449,0.03,2026-08,,https://openrouter.ai/upstage/solar-pro4
 trinity-large-thinking,1369,1386,1414,0.22,2026-04,,https://openrouter.ai/arcee-ai/trinity-large-thinking
 nvidia-nemotron-3.5-lightning-30b-a3b-nvfp4,1351,1373,1421,,,,
-granite-4.2-30b,1342,1363,1398,,2026-08?,,
+granite-4.2-30b,1342,1363,1398,,,,
 granite-4.1-8b,1306,1321,1354,0.05,2026-04,,https://openrouter.ai/ibm-granite/granite-4.1-8b
-granite-4.2-3b,1294,1315,1378,,2026-08?,,
+granite-4.2-3b,1294,1315,1378,,,,
 granite-4.2-8b,1287,1300,1362,0.06,2026-08,,https://openrouter.ai/ibm-granite/granite-4.2-8b
 gpt-5.4-high (codex-harness),,,1457,2.5,2026-03,,https://openrouter.ai/openai/gpt-5.4
 gemini-3.1-pro-preview,1487,1507,1520,2,2026-02,,https://ai.google.dev/gemini-api/docs/pricing
@@ -97,7 +97,7 @@ gpt-5.1-medium,,,1390,1.25,2025-11,,https://openrouter.ai/openai/gpt-5.1
 grok-4.20-beta-0309-reasoning,1471,1488,1510,2,2026-03,,https://openrouter.ai/x-ai/grok-4.20
 gpt-5.2-codex,,,1336,1.75,2026-01,2026-07-23,https://openrouter.ai/openai/gpt-5.2-codex
 gpt-5.1-codex,,,1328,1.25,2025-11,2026-07-23,https://openrouter.ai/openai/gpt-5.1-codex
-KAT-Coder-Pro-V1,,,1257,,2026-03?,,
+KAT-Coder-Pro-V1,,,1257,,,,
 gpt-5.1-codex-mini,,,1238,0.25,2025-11,2026-07-23,https://openrouter.ai/openai/gpt-5.1-codex-mini
 devstral-2,,,1198,0.40,2025-09,,https://openrouter.ai/mistralai/devstral-2512
 grok-code-fast-1,,,1138,0.2,2025-08,2026-05-15,https://openrouter.ai/x-ai/grok-code-fast-1
@@ -110,7 +110,7 @@ claude-opus-4-5-20251101-thinking-32k,1473,1499,1530,5,2025-11,2026-11-24,https:
 claude-opus-4-5-20251101,1469,1498,1523,5,2025-11,2026-11-24,https://docs.anthropic.com/en/docs/about-claude/model-deprecations
 gpt-5.4-high,1476,1498,1520,2.5,2026-03,,https://openai.com/api/pricing/
 gpt-5.2-chat-latest-20260210,1476,1497,1515,1.75,2026-02,2026-08-10,https://openrouter.ai/openai/gpt-5.2-chat
-qwen3.5-max-preview,1465,1492,1513,,2026-03?,,
+qwen3.5-max-preview,1465,1492,1513,,,,
 grok-4.1,1459,1475,1492,3,2025-11,,https://docs.x.ai/developers/models
 gemini-3-flash (thinking-minimal),1458,1475,1490,0.5,2025-12,,https://openrouter.ai/google/gemini-3-flash-preview
 gpt-5.3-chat-latest,1449,1471,1496,1.75,2026-03,2026-08-10,https://openrouter.ai/openai/gpt-5.3-chat
@@ -145,7 +145,7 @@ ernie-5.0-preview-1103,1430,1439,1462,0.84,2025-11,,https://artificialanalysis.a
 kimi-k2-thinking-turbo,1430,1453,1487,0.47,2025-11,,https://openrouter.ai/moonshotai/kimi-k2-thinking
 qwen3-max-preview,1435,1459,1481,1.2,2025-09,,https://openrouter.ai/qwen/qwen3-max
 kimi-k2.5-instant,1431,1461,1505,0.3,2026-01,,https://openrouter.ai/moonshotai/kimi-k2.5
-amazon-nova-experimental-chat-26-02-10,1426,1449,1488,,2026-03?,,
+amazon-nova-experimental-chat-26-02-10,1426,1449,1488,,,,
 gpt-5-chat,1427,1449,1463,1.25,2025-08,2026-07-23,https://openrouter.ai/openai/gpt-5-chat
 qwen3-max-2025-09-23,1424,1447,1473,1.2,2025-09,,https://openrouter.ai/qwen/qwen3-max
 gemini-3.1-flash-lite-preview,1432,1445,1457,0.25,2026-02,2026-05-25,https://ai.google.dev/gemini-api/docs/pricing
