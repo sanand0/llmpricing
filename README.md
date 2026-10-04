@@ -2,13 +2,16 @@
 
 The cost of LLMs is steadily falling, and the quality is rising.
 
-A rough estimate of the **cost of an LLM** is
-the cost per million tokens of input, mostly from [LLMPriceCheck](https://llmpricecheck.com/).
+A rough estimate of the **cost of an LLM** is a representative API input price per million tokens.
+Prefer standard, durable pricing from first-party or mainstream providers (for example OpenAI, Anthropic, Google, AWS/Azure, DeepInfra, Together, Fireworks, Cloudflare, or Alibaba) over unusually cheap small-provider routes, Flex/Batch tiers, or temporary promotions. For legacy models, retain a defensible historical mainstream API price and end date; leave cost blank when no comparable easy-to-use API price is available.
+
+Each model has one representative price, not a historical price series. The month slider therefore shows how today's/historically-audited model economics compare across model lifetimes; it should not be read as an exact invoice price for that past month.
 (Typically, inputs are the bigger component of the cost, compared to outputs.)
 
 A rough estimate of the **quality of an LLM** is
-the ELO score on the [LMSYS Leaderboard](https://lmarena.ai/).
+the ELO score on the [LMSYS Leaderboard](https://arena.ai/).
 (This is like the chess ELO score, but for LLMs, where people compare 2 LLMs on the same task.)
+Pre-Arena API models such as GPT-3 Davinci and text-davinci-003 are retained in `elo.csv` with launch/price/end metadata but blank Elo; they provide historical context without mixing incompatible quality benchmarks into the chart or Pareto frontier.
 
 This chart shows the cost and quality of each LLM.
 
@@ -18,7 +21,7 @@ These are shown in green 🟢 and are the best LLMs to use.
 Some LLMs are "pareto suboptimal", i.e. there is no LLM worse in both cost and quality.
 These are shown in red 🔴 and are the LLMs to avoid.
 
-Last updated: **27 Sep 2026**
+Last updated: **4 Oct 2026**
 
 Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 
@@ -32,32 +35,42 @@ Start a browser with Chrome DevTools Protocol available at `localhost:9222`, the
 just build
 ```
 
-This downloads all three LMArena leaderboards to temporary TSV files and updates `elo.csv`:
+This downloads all three Arena leaderboards to temporary TSV files and updates `elo.csv`.
 
 Run `just push` to stage all changes, commit them as `Update models`, and push.
 
-- https://lmarena.ai/leaderboard/text
-- https://lmarena.ai/leaderboard/text/hard-prompts
-- https://lmarena.ai/leaderboard/text/coding
+- https://arena.ai/leaderboard/text
+- https://arena.ai/leaderboard/text/hard-prompts
+- https://arena.ai/leaderboard/text/coding
 
 For a single leaderboard, run:
 
 ```bash
-uv run download.py https://lmarena.ai/leaderboard/text file.txt
+uv run download.py https://arena.ai/leaderboard/text file.txt
 uv run update_elo.py file.txt --column overall
 ```
 
 Use `--column hard` for `/hard-prompts` and `--column coding` for `/coding`.
+The TSV includes `Model`, `Score`, and `Price $/M` (input/output dollars per million tokens).
+The updater fills blank costs from the input price, preserves existing costs, and prints
+differences as `Model\telo.csv\tarena.ai`. Arena prices marked `N/A` remain unfilled.
+OpenRouter supplies launch and end dates, but does not supply costs in this flow.
+
 `download.py --describe` prints the machine-readable CLI contract.
 
 `download.py` evaluates this script in the page via CDP:
 
 ```js
-$$("table tr").map(d => {
+const rows = $$("table tr");
+const headers = [...rows[0].querySelectorAll("th, td")].map(d => d.innerText.trim());
+const priceIndex = headers.indexOf("Price $/M");
+if (priceIndex < 0) throw new Error("Arena table is missing Price $/M");
+["Model\tScore\tPrice $/M", ...rows.slice(1).map(d => {
   const cells = d.querySelectorAll("td, th");
   const [model, score] = [(cells[2].querySelector("a")?.innerText ?? cells[2].innerText).split(/\n/)[0], cells[3].innerText.split(/\s/)[0]];
-  return `${model}\t${score}`;
-}).join("\n");
+  const price = cells[priceIndex].innerText.trim();
+  return `${model}\t${score}\t${price}`;
+})].join("\n");
 ```
 
 # Billing rates

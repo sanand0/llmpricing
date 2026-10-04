@@ -15,15 +15,27 @@ document.querySelector("#quality").textContent = quality.charAt(0).toUpperCase()
 // Load and process model data
 const data = await d3.csv("elo.csv");
 const hasEloScore = (row, field) => row[field]?.trim() !== "" && Number.isFinite(+row[field]);
+const monthOf = (value) => value?.replace("?", "").slice(0, 7) || "";
 const models = data
   .filter((d) => Number.isFinite(+d.cpmi) && +d.cpmi > 0 && hasEloScore(d, quality))
-  .map((d) => ({ ...d, cost: +d.cpmi, elo: +d[quality] }));
+  .map((d) => ({ ...d, cost: +d.cpmi, elo: +d[quality], launchMonth: monthOf(d.launch) }));
 
 // Scrollytelling state
 let scrollyHighlights = new Set();
 let scrollyActive = false;
 
-const dates = Array.from(new Set(models.map((d) => d.launch))).sort();
+// Use every calendar month from the earliest plotted model through today.
+// Metadata-only pre-Arena rows stay in elo.csv, but the visible race begins when comparable Elo exists.
+const launchMonths = models.map((d) => d.launchMonth).filter(Boolean).sort();
+const now = new Date();
+const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+const firstMonth = launchMonths[0];
+const lastMonth = d3.max([launchMonths.at(-1), currentMonth]);
+const parseMonth = d3.timeParse("%Y-%m");
+const formatMonth = d3.timeFormat("%Y-%m");
+const dates = d3.timeMonth
+  .range(parseMonth(firstMonth), d3.timeMonth.offset(parseMonth(lastMonth), 1))
+  .map(formatMonth);
 const $date = document.querySelector("#date");
 $date.setAttribute("max", dates.length - 1);
 $date.value = dates.length - 1;
@@ -144,7 +156,10 @@ const update = () => {
   const matches = new Set(results.map((r) => r.target));
 
   const filteredModels = models.filter(
-    (d) => d.launch <= date && (d.end ? d.end > date : true) && (search ? matches.has(d.model) : true)
+    (d) =>
+      d.launchMonth <= date &&
+      (d.end ? d.end > `${date}-01` : true) &&
+      (search ? matches.has(d.model) : true)
   );
   updateOptimalStatus(filteredModels);
   renderPlot(filteredModels);
@@ -224,8 +239,11 @@ const animateToMonth = (targetIdx) => {
 const activateCard = (cardData) => {
   scrollyActive = true;
   scrollyHighlights = new Set(cardData.highlight);
-  if (cardData.month) animateToMonth(dates.indexOf(cardData.month));
-  else update();
+  if (cardData.month) {
+    const targetIdx = dates.indexOf(cardData.month);
+    if (targetIdx >= 0) animateToMonth(targetIdx);
+    else update();
+  } else update();
 };
 
 const deactivateScrolly = () => {

@@ -328,7 +328,7 @@ const models = raw
 const monthFormat = d3.utcFormat("%Y-%m");
 const monthParse = d3.utcParse("%Y-%m");
 const shortMonth = d3.utcFormat("%b %y");
-const start = d3.min(models, (d) => monthParse(d.launch));
+const start = monthParse("2023-03");
 const end = d3.max(models, (d) => monthParse(d.launch));
 const months = d3.utcMonth.range(start, d3.utcMonth.offset(end, 1)).map(monthFormat);
 

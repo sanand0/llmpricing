@@ -287,6 +287,51 @@ def validate_end_dates(rows: list[EloRow], *, context: str) -> None:
             raise UpdateEloError(f"{context} model {row['model']!r} has invalid end date {value!r}.")
 
 
+def read_arena_prices(tsv_path: Path) -> dict[str, Decimal]:
+    """Read input dollars per million tokens; unavailable Arena prices stay missing."""
+
+    prices = {}
+    with tsv_path.open(encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle, delimiter="\t")
+        if "Price $/M" not in (reader.fieldnames or []):
+            raise UpdateEloError(f"{tsv_path} is missing the Arena Price $/M column. Re-run download.py.")
+        for row in reader:
+            value = (row.get("Price $/M") or "").strip()
+            if value in {"", "N/A", "-", "—"}:
+                continue
+            value = value.split("/")[0].strip()
+            try:
+                price = Decimal(value.removeprefix("$").replace(",", ""))
+            except InvalidOperation as exc:
+                raise UpdateEloError(f"Invalid Arena price {value!r} for {row['Model']!r}.") from exc
+            if not price.is_finite() or price < 0:
+                raise UpdateEloError(f"Invalid Arena price {value!r} for {row['Model']!r}.")
+            prices[row["Model"].strip()] = price
+    return prices
+
+
+def apply_arena_prices(rows: list[EloRow], prices: dict[str, Decimal]) -> int:
+    """Fill blank costs and print tab-separated differences, preserving existing costs."""
+
+    filled = 0
+    warned = False
+    for row in rows:
+        price = prices.get(row["model"])
+        if price is None:
+            continue
+        value = format_decimal(price)
+        if not row["cpmi"]:
+            row["cpmi"] = value
+            row["source"] = "https://arena.ai/leaderboard/text"
+            filled += 1
+        elif Decimal(row["cpmi"]) != price:
+            if not warned:
+                typer.echo("Model\telo.csv\tarena.ai")
+                warned = True
+            typer.echo(f"{row['model']}\t{row['cpmi']}\t{value}")
+    return filled
+
+
 def read_elo_rows(elo_path: Path) -> tuple[list[str], list[EloRow]]:
     """Load `elo.csv` while preserving header order."""
 
@@ -479,13 +524,14 @@ def update_openrouter_metadata(
     model_name: str,
     matcher: OpenRouterMatcher,
     prompt_price: Callable[[OpenRouterModel], Decimal] | None = None,
+    fill_pricing: bool = True,
 ) -> OpenRouterUpdateResult:
     """Fill blank OpenRouter-backed metadata for a row.
 
     Returns which fields were updated, or indicates that no safe match was found.
     """
 
-    needs_pricing = not row["cpmi"] or not row["source"]
+    needs_pricing = fill_pricing and (not row["cpmi"] or not row["source"])
     needs_launch = not row["launch"]
     needs_end = not row["end"]
     if not needs_pricing and not needs_launch and not needs_end:
@@ -496,12 +542,12 @@ def update_openrouter_metadata(
         return OpenRouterUpdateResult(missing_match=needs_pricing or needs_launch)
 
     pricing_updated = False
-    if not row["cpmi"]:
+    if fill_pricing and not row["cpmi"]:
         resolved_price = prompt_price(match) if prompt_price else match.prompt_price
         cpmi_value = resolved_price * TOKENS_PER_MILLION
         row["cpmi"] = "" if cpmi_value <= 0 else format_decimal(cpmi_value)
         pricing_updated = True
-    if not row["source"]:
+    if fill_pricing and not row["source"]:
         row["source"] = match.source_url
         pricing_updated = True
 
@@ -527,6 +573,7 @@ def apply_updates(
     matcher: OpenRouterMatcher,
     now: datetime,
     prompt_price: Callable[[OpenRouterModel], Decimal] | None = None,
+    arena_prices: dict[str, Decimal] | None = None,
 ) -> UpdateSummary:
     """Apply TSV scores and metadata updates to in-memory CSV rows."""
 
@@ -552,6 +599,7 @@ def apply_updates(
             model_name=model_name,
             matcher=matcher,
             prompt_price=prompt_price,
+            fill_pricing=arena_prices is None,
         )
         if metadata_update.missing_match:
             summary.unmatched_openrouter.append(model_name)
@@ -564,6 +612,9 @@ def apply_updates(
 
     for row in new_rows:
         insert_row_by_score(rows, row, target_column=target_column)
+
+    if arena_prices is not None:
+        summary.priced += apply_arena_prices(rows, arena_prices)
 
     return summary
 
@@ -584,7 +635,7 @@ def print_summary(
         f"{summary.updated} existing rows and added {summary.added} new rows "
         f"for {display_column} ({update_count} input models)."
     )
-    typer.echo(f"Updated pricing metadata for {summary.priced} touched models from OpenRouter.")
+    typer.echo(f"Filled missing input costs for {summary.priced} models from Arena.")
     if summary.launched:
         typer.echo(f"Updated launch dates for {summary.launched} touched models from OpenRouter.")
     if summary.unmatched_openrouter:
@@ -613,7 +664,7 @@ def main(
         exists=True,
         dir_okay=False,
         readable=True,
-        help="TSV file containing Model and Score columns.",
+        help="Arena TSV containing Model, Score, and Price $/M columns.",
     ),
     column: str = typer.Option(
         ...,
@@ -636,12 +687,13 @@ def main(
         help="Preview the update without writing elo.csv.",
     ),
 ) -> None:
-    """Update elo.csv scores from a TSV export and refresh OpenRouter pricing when possible."""
+    """Update scores and fill costs from an Arena TSV; fetch dates from OpenRouter."""
 
     try:
         headers, rows = read_elo_rows(elo_path)
         target_column = resolve_column(column, headers)
         updates = read_updates(file_path)
+        arena_prices = read_arena_prices(file_path)
         matcher = OpenRouterMatcher(fetch_openrouter_models())
         now = datetime.now(UTC)
         summary = apply_updates(
@@ -651,7 +703,7 @@ def main(
             updates=updates,
             matcher=matcher,
             now=now,
-            prompt_price=fetch_openrouter_prompt_price,
+            arena_prices=arena_prices,
         )
     except UpdateEloError as exc:
         typer.echo(f"Error: {exc}", err=True)

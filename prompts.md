@@ -1,5 +1,106 @@
 # Prompts
 
+## Update model costs and dates, 04 Oct 2026
+
+<!-- llmpricing - Update model costs and dates: https://chatgpt.com/c/6ac1cb32-8e44-83ec-9e55-0466a3c7c6fb (2026-10-04T12:19:14+08:00) -->
+
+On @LocalMCP2 go through ~/code/llmpricing/elo.csv and make sure that the start month is present for every model that has a cost listed. Update the end dates for models with known deprecations.
+
+---
+
+Review and update/correct the dates and pricing for these models based on OpenRouter or other possible popular sources where people can easily access the models via API. Skip obscure sources.
+
+llama-13b
+codellama-70b-instruct
+nous-hermes-2-mixtral-8x7b-dpo
+snowflake-arctic-instruct
+gemini-exp-1114
+gpt-4-0613
+llama-2-7b-chat
+claude-2.0
+claude-2.1
+gemma-2-9b-it-simpo
+llama-3-8b-instruct
+mistral-7b-instruct-v0.2
+gemma-3n-e4b-it
+yi-large
+yi-large-preview
+
+---
+
+Go through the frontier models each month, i.e. the models that have nothing cheaper AND better in any month, as well as models that have nothing costlier AND worse in any month. Make this list and double-check their prices and start / end dates in particular. Plan how to do this efficiently and execute.
+
+---
+
+For these frontier models, if there were significant price changes (i.e. that would have moved them in/out of the frontier or is above 1.5x or below 0.7x) then split into one row for each cost regime.
+
+---
+
+Did this complete? If not, complete it. Also, DeepSeek v4.1 Flash has an extreme pricing that might be unsustainable. Use the pricing from a popular provider that will likely sustain.
+
+Then: Review and revise the narrative story. (Rewrite it if required from scratch.)
+The aim is to tell the story of how model intelligence evolved.
+Use the HS freshman -> Tenured professor scale where possible.
+Prefer telling a story of how each threshold (HS graduate, College junior, ...) was breached
+as well as the outliers among the frontier models that pushed the boundaries
+(I mean pushing along the DIAGONAL, i.e. if we mentally drew a line on the frontier, which one jumps up from the perpendicular the most, so to speak, and offers the most value for money and changes the shape of the frontier with a kink).
+as well as models that attracted a lot of attention.
+Not too long a story. In any case, flag the key moments in the story with a ⭐ that is clearly visible.
+Someone just scrolling through the story should notice it enough to pause and take a closer look.
+
+<!-- llmpricing - Update model costs and dates: https://chatgpt.com/c/6ac1cb32-8e44-83ec-9e55-0466a3c7c6fb (2026-10-04T15:18:10+08:00) -->
+
+Did this complete? If not, complete it. Also, DeepSeek v4.1 Flash has an extreme pricing that might be unsustainable. Use the pricing from a popular provider that will likely sustain. In general, prefer such prices.
+
+Then: Review and revise the narrative story. (Rewrite it if required from scratch.)
+The aim is to tell the story of how model intelligence evolved.
+Use the HS freshman -> Tenured professor scale where possible.
+Prefer telling a story of how each threshold (HS graduate, College junior, ...) was breached
+as well as the outliers among the frontier models that pushed the boundaries
+(I mean pushing along the DIAGONAL, i.e. if we mentally drew a line on the frontier, which one jumps up from the perpendicular the most, so to speak, and offers the most value for money and changes the shape of the frontier with a kink).
+as well as models that attracted a lot of attention.
+Not too long a story. In any case, flag the key moments in the story with a ⭐ that is clearly visible.
+Someone just scrolling through the story should notice it enough to pause and take a closer look.
+
+---
+
+The story begins in Mar 2023. Go further back in time with the GPT 3.5 or even 3.0 API releases and add this to elo.csv to the extent possible.
+
+Break "How to read the race" into paragraphs and use a list for the intelligence levels.
+
+Now, everything has a ⭐ which defeats the purpose - so let's just drop the ⭐.
+
+When I go to "The professor line races left" the timeline moves back to Mar 2023 but it should move to the end. Fix that.
+
+Review the story against my intent - which probably became clearer with my comments above - and revise as required.
+
+---
+
+Start the timeline at Mar 2023, then. Even when I move the slider to the left edge, I want some models visible. Revise narrative accordingly.
+
+---
+
+When starting, let the story card show on the left, so that the legend on the right (professor, graduate, etc.) is also visible.
+
+---
+
+Update intelligence.html as well to start in Mar 2023.
+
+## Use Arena costs where available for new / missing models, 04 Oct 2026
+
+<!--
+cd ~/code/llmpricing
+dev.sh -- codex --yolo --model gpt-6.1-sol --config model_reasoning_effort=medium
+-->
+
+Replace lmarena.ai -> arena.ai in the code (not prompts.md).
+Revise the code in this repo to use the model input costs (Price $/M column) available from arena.ai.
+Fill missing costs in elo.csv.
+Warn about cost differences between elo.csv and arena.ai as `Model\telo.csv\tarena.ai` on the console.
+Run and test.
+
+<!-- codex resume 01a104f5-456a-7b72-a8cc-865586b61e1c --yolo -->
+
 ## Update expiry dates, storyline, 30 Aug 2026
 
 Generated via ChatGPT + LocalMCP.
@@ -98,11 +199,16 @@ Create an agent-friendly `download.py` that can visit any of these pages via CDP
 ... and save the output of the following script:
 
 ```js
-$$("table tr").map(d => {
-  const cells = d.querySelectorAll("td, th");
-  const [model, score] = [cells[2].querySelector("a")?.innerText ?? cells[2].innerText, cells[3].innerText.split(/\s/)[0]];
-  return `${model}\t${score}`;
-}).join("\n");
+$$("table tr")
+  .map((d) => {
+    const cells = d.querySelectorAll("td, th");
+    const [model, score] = [
+      cells[2].querySelector("a")?.innerText ?? cells[2].innerText,
+      cells[3].innerText.split(/\s/)[0],
+    ];
+    return `${model}\t${score}`;
+  })
+  .join("\n");
 ```
 
 ... as a temporary file, e.g. file.txt and run:

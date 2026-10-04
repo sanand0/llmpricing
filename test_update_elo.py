@@ -3,15 +3,20 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
+from typer.testing import CliRunner
+
+import update_elo
 
 from update_elo import (
     OpenRouterMatcher,
     OpenRouterModel,
     UpdateEloError,
     apply_updates,
+    apply_arena_prices,
     infer_openrouter_end_label,
     lowest_prompt_price,
     read_elo_rows,
+    read_arena_prices,
     write_rows,
 )
 
@@ -192,3 +197,70 @@ def test_openrouter_sentinel_expiry_is_ignored() -> None:
     assert infer_openrouter_end_label("2098-12-31") is None
     assert infer_openrouter_end_label("invalid") is None
     assert infer_openrouter_end_label("2026-12-31") == "2026-12-31"
+
+
+def test_read_arena_input_prices(tmp_path: Path) -> None:
+    path = tmp_path / "arena.tsv"
+    path.write_text(
+        "Model\tScore\tPrice $/M\npriced\t1500\t$1.40 / $4.40\n"
+        "missing\t1400\tN/A\nfree\t1300\t$0 / $1\n",
+        encoding="utf-8",
+    )
+    assert read_arena_prices(path) == {"priced": Decimal("1.4"), "free": Decimal("0")}
+
+
+@pytest.mark.parametrize("value", ["invalid", "NaN", "Infinity", "-1"])
+def test_read_arena_rejects_invalid_prices(tmp_path: Path, value: str) -> None:
+    path = tmp_path / "arena.tsv"
+    path.write_text(f"Model\tScore\tPrice $/M\nmodel\t1500\t{value}\n", encoding="utf-8")
+    with pytest.raises(UpdateEloError, match="Invalid Arena price"):
+        read_arena_prices(path)
+
+
+def test_arena_fills_only_missing_costs_and_warns(capsys) -> None:
+    rows = [
+        dict(zip(HEADERS, [name, "1", "", "", cost, "", "", "old-source"]))
+        for name, cost in [("blank", ""), ("different", "2"), ("equal", "1.00"), ("unknown", "")]
+    ]
+    filled = apply_arena_prices(rows, {name: Decimal("1") for name in ["blank", "different", "equal"]})
+    assert filled == 1
+    assert [row["cpmi"] for row in rows] == ["1", "2", "1.00", ""]
+    assert rows[0]["source"] == "https://arena.ai/leaderboard/text"
+    assert rows[1]["source"] == "old-source"
+    assert capsys.readouterr().out == "Model\telo.csv\tarena.ai\ndifferent\t2\t1\n"
+
+
+def test_arena_prices_disable_openrouter_cost_fallback() -> None:
+    rows = []
+    summary = apply_updates(
+        HEADERS, rows, target_column="overall",
+        updates={"priced": "1500", "unknown": "1400", "free": "1300"},
+        matcher=OpenRouterMatcher([openrouter_model(name) for name in ["priced", "unknown", "free"]]),
+        now=datetime(2026, 10, 4, tzinfo=UTC),
+        arena_prices={"priced": Decimal("2"), "free": Decimal("0")},
+    )
+    assert [row["cpmi"] for row in rows] == ["2", "", "0"]
+    assert summary.priced == 2
+    assert all(row["launch"] == "2026-08" for row in rows)
+
+
+def test_cli_arena_write_and_dry_run(tmp_path: Path, monkeypatch) -> None:
+    elo = tmp_path / "elo.csv"
+    elo.write_text("model,overall,hard,coding,cpmi,launch,end,source\nmodel,1,,,2,2026-08,,old\n")
+    original = elo.read_bytes()
+    tsv = tmp_path / "arena.tsv"
+    tsv.write_text("Model\tScore\tPrice $/M\nmodel\t1500\t$3 / $10\nnew\t1400\t$0.50 / $2\n")
+    monkeypatch.setattr(update_elo, "fetch_openrouter_models", lambda: [])
+    args = [str(tsv), "--column", "overall", "--elo", str(elo)]
+    runner = CliRunner()
+    preview = runner.invoke(update_elo.app, [*args, "--dry-run"])
+    assert preview.exit_code == 0, preview.output
+    assert elo.read_bytes() == original
+    result = runner.invoke(update_elo.app, args)
+    assert result.exit_code == 0, result.output
+    assert "Model\telo.csv\tarena.ai\nmodel\t2\t3\n" in result.output
+    assert "1 models from Arena" in result.output
+    _, rows = read_elo_rows(elo)
+    assert [(row["model"], row["overall"], row["cpmi"]) for row in rows] == [
+        ("model", "1500", "2"), ("new", "1400", "0.5")
+    ]

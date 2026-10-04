@@ -20,11 +20,16 @@ import typer
 app = typer.Typer(add_completion=False, no_args_is_help=True)
 
 EXTRACT_SCRIPT = r"""
-$$("table tr").map(d => {
+const rows = $$("table tr");
+const headers = [...rows[0].querySelectorAll("th, td")].map(d => d.innerText.trim());
+const priceIndex = headers.indexOf("Price $/M");
+if (priceIndex < 0) throw new Error("Arena table is missing Price $/M");
+["Model\tScore\tPrice $/M", ...rows.slice(1).map(d => {
   const cells = d.querySelectorAll("td, th");
   const [model, score] = [(cells[2].querySelector("a")?.innerText ?? cells[2].innerText).split(/\n/)[0], cells[3].innerText.split(/\s/)[0]];
-  return `${model}\t${score}`;
-}).join("\n");
+  const price = cells[priceIndex].innerText.trim();
+  return `${model}\t${score}\t${price}`;
+})].join("\n");
 """.strip()
 
 
@@ -34,7 +39,7 @@ def describe() -> None:
     typer.echo(
         json.dumps(
             {
-                "description": "Download an LMArena leaderboard TSV via CDP localhost:9222.",
+                "description": "Download Arena model scores and input prices ($/M) via CDP localhost:9222.",
                 "arguments": {
                     "url": "Leaderboard URL to visit.",
                     "output": "Path to write the TSV export.",

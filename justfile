@@ -12,9 +12,9 @@ build:
       uv run update_elo.py "$output" --column "$column"
     }
 
-    update overall https://lmarena.ai/leaderboard/text
-    update hard https://lmarena.ai/leaderboard/text/hard-prompts
-    update coding https://lmarena.ai/leaderboard/text/coding
+    update overall https://arena.ai/leaderboard/text
+    update hard https://arena.ai/leaderboard/text/hard-prompts
+    update coding https://arena.ai/leaderboard/text/coding
 
 push:
     git add .

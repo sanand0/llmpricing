@@ -2,243 +2,193 @@
   "cards": [
     {
       "id": "orient",
-      "month": "2026-08",
-      "position": "right",
+      "month": "2023-03",
+      "position": "left",
       "vertical": "top",
       "highlight": [],
-      "title": "How to read this chart",
-      "body": "<p>The vertical axis is intelligence — mapped to the academic ladder on the right. Elo 1100 is high school freshman; Elo 1480 is tenured professor. The horizontal axis is cost: one million input tokens — roughly the entire King James Bible — priced from two cents to $75. <strong>The upper-left corner is the dream: brilliant and cheap.</strong> This is the story of how the world got there.</p>",
-      "links": []
+      "title": "How to read the race",
+      "body": "<p>The vertical axis is Arena Elo: a rough measure of how good a model's answers feel to people. The horizontal axis is API input cost per million tokens, on a log scale. <strong>Upper-left is the destination: smarter and cheaper.</strong></p><p>I use this deliberately rough academic ladder to make the vertical movement tangible:</p><ul><li>1100 — HS freshman</li><li>1200 — HS graduate</li><li>1300 — College junior</li><li>1350 — College graduate</li><li>1400 — Master's student</li><li>1450 — PhD candidate</li><li>1480 — Tenured professor</li></ul><p>The visible race starts in <strong>March 2023</strong>, when comparable Arena-era Elo begins. Older GPT-3 API models remain in <code>elo.csv</code> as historical metadata, but without comparable Elo they do not appear on this chart. Green points are the best price-quality frontier. The interesting points are not just the highest models, but the <em>kinks</em>: models that jut unusually far up-left relative to their frontier neighbors.</p>",
+      "links": [
+        {
+          "text": "Arena Leaderboard",
+          "url": "https://arena.ai/leaderboard"
+        }
+      ]
     },
     {
-      "id": "year-zero",
+      "id": "gpt4",
       "month": "2023-03",
       "position": "right",
       "vertical": "bottom",
       "highlight": [
-        "gpt-3.5-turbo-0314",
-        "claude-1",
+        "gpt-3.5-turbo-0301",
         "gpt-4-0314"
       ],
-      "title": "March 2023 — Year Zero",
-      "body": "<p>March 2023 begins with GPT-3.5 and Claude 1 near the bottom of the chart. Then GPT-4 arrives on March 14 at Elo 1287 — far above Claude 1 at 1158 and GPT-3.5 at 1141 — but at $30 per million input tokens. <strong>Capability had arrived. Affordability had not.</strong></p>",
+      "title": "March 2023 — The race begins",
+      "body": "<p>The left edge already has a useful spread. GPT-3.5 Turbo sits around <strong>Elo 1141 — HS freshman territory — at $2/M</strong>. GPT-4 lands at <strong>1288 for $30/M</strong>: it clears the HS-graduate line and almost reaches college junior in one jump.</p><p>The first lesson is stark: <strong>intelligence arrived faster than affordability.</strong> From here, the story is how successive models climb the academic ladder while the frontier keeps moving left.</p>",
       "links": [
         {
-          "text": "OpenAI introduces GPT-4",
+          "text": "OpenAI: ChatGPT API",
+          "url": "https://openai.com/index/introducing-chatgpt-and-whisper-apis/"
+        },
+        {
+          "text": "OpenAI: GPT-4",
           "url": "https://openai.com/index/gpt-4-research/"
         },
         {
-          "text": "LMSYS Chatbot Arena launches (May 2023)",
-          "url": "https://lmsys.org/blog/2023-05-03-arena/"
+          "text": "LMSYS: early Chatbot Arena leaderboard",
+          "url": "https://www.lmsys.org/blog/2023-05-10-leaderboard/"
         }
       ]
     },
     {
-      "id": "the-leap",
+      "id": "college-junior",
       "month": "2023-11",
       "position": "left",
       "vertical": "top",
       "highlight": [
+        "gpt-4-0314",
         "gpt-4-1106-preview"
       ],
-      "title": "November 2023 — The First Price Collapse",
-      "body": "<p>November 6, 2023: GPT-4 Turbo reaches Elo 1312, only 25 points above the original GPT-4 — while input price falls from $30 to $10 per million tokens. <strong>More capability for one-third the price.</strong> A pattern that will repeat for the next three years has begun: the frontier moves up and left at the same time.</p>",
+      "title": "November 2023 — College junior, one-third the price",
+      "body": "<p>GPT-4 Turbo reaches <strong>Elo 1313</strong>, the first model here to clear the <strong>college-junior line</strong>. At $10/M, it also costs one-third as much on input as the original GPT-4.</p><p>That combination matters more than either number alone. From here on, the frontier usually advances <strong>diagonally: up in intelligence while moving left in price.</strong></p>",
       "links": [
         {
-          "text": "OpenAI DevDay announcement",
-          "url": "https://openai.com/blog/new-models-and-developer-products-announced-at-devday"
+          "text": "OpenAI DevDay: GPT-4 Turbo",
+          "url": "https://openai.com/index/new-models-and-developer-products-announced-at-devday/"
         }
       ]
     },
     {
-      "id": "the-split",
-      "month": "2024-03",
-      "position": "right",
-      "vertical": "bottom",
-      "highlight": [
-        "claude-3-opus-20240229",
-        "claude-3-sonnet-20240229",
-        "claude-3-haiku-20240307"
-      ],
-      "title": "March 2024 — The Split",
-      "body": "<p>March 2024: Anthropic launches Claude 3 in three tiers. Opus and Sonnet arrive March 4; Haiku follows March 13. On this chart, Opus scores Elo 1322 at $15, Sonnet 1281 at $3, and Haiku 1261 at $0.25. <strong>A 60× price spread — same company, same model family.</strong> The intelligence market had learned to stratify, and every business began thinking in tiers.</p>",
-      "links": [
-        {
-          "text": "Anthropic Claude 3 announcement",
-          "url": "https://www.anthropic.com/news/claude-3-family"
-        }
-      ]
-    },
-    {
-      "id": "summer-pivot",
-      "month": "2024-07",
-      "position": "left",
-      "vertical": "top",
-      "highlight": [
-        "claude-3-5-sonnet-20240620",
-        "llama-3.1-405b-instruct-bf16"
-      ],
-      "title": "Summer 2024 — The Pivot",
-      "body": "<p>Summer 2024 bends the economics again. Claude 3.5 Sonnet arrives June 20 at Elo 1343 for $3 per million tokens — five times cheaper than Claude 3 Opus, with better quality. Meta follows on July 23 with Llama 3.1 405B, scoring Elo 1335 at $2 on this chart, with weights available to self-host. <strong>The question changes from “can we afford AI?” to “what are we waiting for?”</strong></p>",
-      "links": [
-        {
-          "text": "Claude 3.5 Sonnet launch",
-          "url": "https://www.anthropic.com/news/claude-3-5-sonnet"
-        },
-        {
-          "text": "Meta releases Llama 3.1",
-          "url": "https://ai.meta.com/blog/meta-llama-3-1/"
-        }
-      ]
-    },
-    {
-      "id": "thinking",
+      "id": "cheap-kinks",
       "month": "2024-09",
       "position": "right",
       "vertical": "top",
       "highlight": [
-        "o1-preview"
+        "claude-3-haiku-20240307",
+        "gemma-2-9b-it",
+        "gpt-4o-mini-2024-07-18"
       ],
-      "title": "September 2024 — The Thinking Machine",
-      "body": "<p>September 2024: OpenAI o1. It didn’t just answer — it reasoned. Before responding, it ran an internal monologue: checking its own logic, catching its own errors. <strong>Elo 1388 — the biggest single-model quality jump since GPT-4.</strong> It scored at or above PhD-expert level on GPQA Diamond, a benchmark of graduate-level science questions. Price: $15. For the first time, AI felt less like autocomplete and more like a colleague you’d genuinely consult.</p>",
+      "title": "2024 — Cheap models start reshaping the frontier",
+      "body": "<p>Claude 3 Haiku reaches Elo 1262 at $0.25/M and makes a conspicuous bend in the frontier. Then Gemma 2 9B reaches <strong>1267 for $0.03/M</strong>. In log-price/Elo space, it is the largest local kink in this series: roughly <strong>138 Elo above the straight line between its neighboring frontier points</strong>.</p><p>GPT-4o mini then reaches <strong>1318 for $0.15/M</strong>. College-junior-level intelligence, which cost $10/M less than a year earlier, is suddenly available for cents. <strong>The leftward race is now as important as the upward one.</strong></p>",
       "links": [
         {
-          "text": "OpenAI o1 system card",
-          "url": "https://openai.com/index/openai-o1-system-card/"
+          "text": "Anthropic: Claude 3 Haiku",
+          "url": "https://www.anthropic.com/news/claude-3-haiku"
         },
         {
-          "text": "GPQA Diamond benchmark results",
-          "url": "https://arxiv.org/abs/2311.12022"
+          "text": "Google: Gemma 2",
+          "url": "https://blog.google/innovation-and-ai/technology/developers-tools/google-gemma-2/"
+        },
+        {
+          "text": "OpenAI: GPT-4o mini",
+          "url": "https://openai.com/index/gpt-4o-mini-advancing-cost-efficient-intelligence/"
         }
       ]
     },
     {
-      "id": "earthquake",
-      "month": "2025-01",
+      "id": "reasoning",
+      "month": "2024-12",
       "position": "left",
       "vertical": "bottom",
       "highlight": [
-        "deepseek-r1"
+        "o1-preview",
+        "o1-2024-12-17"
       ],
-      "title": "January 2025 — The Earthquake",
-      "body": "<p>January 20, 2025. DeepSeek R1 matched o1-level reasoning (Elo 1398) at $0.55 per million tokens — <strong>a 27× discount.</strong> The announcement wiped $600 billion from Nvidia’s market cap in a single day. Silicon Valley assumed expensive compute was a moat. DeepSeek proved it was just a starting point. PhD-approaching reasoning for fifty-five cents per Bible.</p>",
+      "title": "Late 2024 — Reasoning breaks two ceilings",
+      "body": "<p>o1-preview reaches <strong>Elo 1389</strong>, the first model here past the <strong>college-graduate line (1350)</strong>. December's o1 reaches <strong>1402</strong>, crossing the <strong>master's-student line (1400)</strong>.</p><p>This is mostly a vertical leap — $15/M is not cheap — but it changes the direction of model design. Spending inference-time compute to reason before answering opens a new capability path.</p>",
       "links": [
         {
-          "text": "Reuters: DeepSeek wipes $600B from Nvidia",
-          "url": "https://www.reuters.com/technology/chinas-deepseek-sets-off-ai-market-rout-2025-01-27/"
-        },
+          "text": "OpenAI: Learning to reason with LLMs",
+          "url": "https://openai.com/index/learning-to-reason-with-llms/"
+        }
+      ]
+    },
+    {
+      "id": "deepseek",
+      "month": "2025-01",
+      "position": "right",
+      "vertical": "top",
+      "highlight": [
+        "deepseek-r1",
+        "o1-2024-12-17"
+      ],
+      "title": "January 2025 — Reasoning gets a price shock",
+      "body": "<p>DeepSeek R1 reaches <strong>Elo 1398 for $0.70/M</strong>: almost the same intelligence as o1 at $15/M, about <strong>21× cheaper on input</strong>. Geometrically it is a real kink too — about 31 Elo above the local frontier chord.</p><p>The reaction was unusually large because the chart's economics suddenly mattered to everyone, not just API buyers. DeepSeek triggered a global debate about whether frontier capability really required frontier spending, alongside a historic Nvidia sell-off.</p>",
+      "links": [
         {
           "text": "DeepSeek R1 technical report",
           "url": "https://arxiv.org/abs/2501.12948"
+        },
+        {
+          "text": "Reuters: the DeepSeek market shock",
+          "url": "https://www.reuters.com/technology/chinas-deepseek-sets-off-ai-market-rout-2025-01-27/"
         }
       ]
     },
     {
-      "id": "race",
+      "id": "phd",
       "month": "2025-06",
-      "position": "right",
-      "vertical": "top",
-      "highlight": [
-        "gemini-2.5-pro-preview-06-05",
-        "gemini-2.5-flash-preview-05-20"
-      ],
-      "title": "Mid-2025 — The Race to the Top-Left",
-      "body": "<p>By mid-2025, the upper-left corner is filling fast. Gemini 2.5 Pro reaches Elo 1476 at $1.25 per million tokens. Gemini 2.5 Flash Preview reaches Elo 1420 for just 15 cents — another point on the same price-quality frontier. <strong>The frontier is no longer just moving up. It is moving left.</strong></p>",
-      "links": [
-        {
-          "text": "Google Gemini 2.5 Pro launch",
-          "url": "https://blog.google/technology/google-deepmind/gemini-model-updates-february-2025/"
-        }
-      ]
-    },
-    {
-      "id": "scholar",
-      "month": "2026-02",
       "position": "left",
       "vertical": "top",
       "highlight": [
-        "claude-opus-4-6-thinking",
-        "gemini-3.1-pro-preview"
+        "gemini-2.5-flash-preview-05-20",
+        "gemini-2.5-pro-preview-06-05"
       ],
-      "title": "February 2026 — The Professor Shelf",
-      "body": "<p>Early 2026 turns the frontier from a single peak into a shelf. Claude Opus 4.6 Thinking crosses 1500 Elo at $5 per million input tokens, while Gemini 3.1 Pro Preview sits just below the tenured-professor line at $2. These are no longer demo models: million-token context, tool use, code execution, grounding, and multimodal inputs are becoming ordinary product surfaces. <strong>The frontier is still expensive, but professor-level work is no longer rare.</strong></p>",
+      "title": "Mid-2025 — The PhD line falls",
+      "body": "<p>Gemini 2.5 Flash reaches <strong>1420 for $0.15/M</strong>, another sharp value kink. Then Gemini 2.5 Pro reaches <strong>1476 for $1.25/M</strong>, the first model in this data above the <strong>PhD-candidate line (1450)</strong>.</p><p>The important shape is the shelf: near the top model sits a much cheaper model only one academic rung below. Routing starts to make more sense than choosing a single default model.</p>",
       "links": [
         {
-          "text": "LMArena Leaderboard",
-          "url": "https://lmarena.ai/leaderboard"
-        },
-        {
-          "text": "Gemini 3.1 Pro Preview docs",
-          "url": "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-pro-preview"
+          "text": "Google: Gemini 2.5 Pro",
+          "url": "https://blog.google/products-and-platforms/products/gemini/gemini-2-5-pro-latest-preview/"
         }
       ]
     },
     {
-      "id": "agentic-split",
-      "month": "2026-06",
+      "id": "professor",
+      "month": "2025-11",
       "position": "right",
-      "vertical": "top",
-      "highlight": [
-        "claude-fable-5",
-        "muse-spark-1.1",
-        "glm-5.2-max",
-        "gemma-4-31b"
-      ],
-      "title": "June 2026 — The Routing Ladder",
-      "body": "<p>By June 2026, the price-quality frontier looks like a routing table. Claude Fable 5 sits at Elo 1507 for $10. Muse Spark 1.1 reaches 1490 for $1.25. GLM 5.2 Max reaches 1472 for about $0.33, and Gemma 4 31B reaches 1451 for $0.12. <strong>Every step down buys a large price cut for a small capability trade-off.</strong> The operational question is no longer “which model is best?” but “which is the cheapest model that reliably finishes this task?”</p>",
-      "links": [
-        {
-          "text": "Anthropic: Claude Fable 5 and Mythos 5",
-          "url": "https://www.anthropic.com/news/claude-fable-5-mythos-5"
-        },
-        {
-          "text": "OpenRouter: Muse Spark 1.1",
-          "url": "https://openrouter.ai/meta/muse-spark-1.1"
-        },
-        {
-          "text": "OpenRouter: GLM 5.2",
-          "url": "https://openrouter.ai/z-ai/glm-5.2"
-        }
-      ]
-    },
-    {
-      "id": "cheap-frontier",
-      "month": "2026-08",
-      "position": "left",
       "vertical": "bottom",
       "highlight": [
-        "muse-spark-1.2 (xHigh)",
-        "glm-5.3-flash"
+        "gemini-3-pro",
+        "gemini-3-flash"
       ],
-      "title": "August 2026 — Seven-and-a-Half Cents",
-      "body": "<p>August 2026 makes the price gap hard to ignore. GLM 5.3 Flash reaches Elo 1469 for just 7.5 cents per million input tokens — only 38 Elo points below the $10 leader, Claude Fable 5, at roughly <strong>one-133rd the price.</strong> On coding, GLM Flash scores 1531 versus Fable’s 1551. Meanwhile Muse Spark 1.2 reaches Elo 1498 for $1.25 and sits on the overall price-quality frontier. The frontier is no longer one model. It is a menu. <strong>Paying for the best model by default is now an architectural mistake.</strong></p>",
+      "title": "Late 2025 — The tenured-professor line falls",
+      "body": "<p>Gemini 3 Pro reaches <strong>Elo 1485 at $2/M</strong>, the first point here above the <strong>tenured-professor line (1480)</strong>. One month later Gemini 3 Flash sits at <strong>1473 for $0.50/M</strong>.</p><p>The gap between peak intelligence and cheap intelligence is no longer measured in academic stages. It is measured in a handful of Elo points.</p>",
       "links": [
         {
-          "text": "OpenRouter: GLM 5.3 Flash",
-          "url": "https://openrouter.ai/z-ai/glm-5.3-flash"
-        },
-        {
-          "text": "OpenRouter: Muse Spark 1.2",
-          "url": "https://openrouter.ai/meta/muse-spark-1.2"
+          "text": "Arena Leaderboard",
+          "url": "https://arena.ai/leaderboard"
         }
       ]
     },
     {
-      "id": "implications",
-      "month": "2026-08",
-      "position": "center",
+      "id": "professor-cheap",
+      "month": "2026-10",
+      "position": "left",
       "vertical": "top",
-      "highlight": [],
-      "title": "So What Does This Mean?",
-      "body": "<p>In 2023, reaching master’s-level AI for 100 analysts meant paying $30/MTok — roughly $135,000 a month. By August 2026, credible near-frontier models range from $10 down to seven and a half cents per million tokens. The new operating discipline is portfolio management: fast cheap models for drafts, routing, and increasingly serious coding; mid-tier models for most analysis; top models for the stubborn judgment-heavy cases. <strong>The question is no longer whether intelligence is affordable. It is whether your workflows know when not to overpay for it.</strong></p>",
+      "highlight": [
+        "gemma-4-31b",
+        "glm-5.3-flash",
+        "deepseek-v4.1-flash-max",
+        "mimo-v2.6-pro",
+        "gemini-3.8-flash-high",
+        "claude-opus-5.5-high"
+      ],
+      "title": "2026 — The professor line races left",
+      "body": "<p>By October 2026 the upper frontier is a staircase: Gemma 4 31B at <strong>1453/$0.09</strong>; GLM 5.3 Flash at <strong>1473/$0.15</strong>; DeepSeek V4.1 Flash at <strong>1474/$0.20</strong> using DeepInfra's non-promotional Standard rate; Mimo V2.6 Pro at <strong>1480/$0.43</strong>; Gemini 3.8 Flash at <strong>1495/$0.75</strong>; Claude Opus 5.5 at <strong>1504/$4</strong>.</p><p>Compared with March 2023 GPT-4, Mimo is <strong>192 Elo higher and about 70× cheaper on input</strong>. Even the 1480 threshold moves from $2 with Gemini 3 Pro in November 2025 to $0.43 ten months later — <strong>about 4.7× cheaper</strong>.</p><p>That is the central story of the chart: intelligence first climbed the academic ladder; then, increasingly, <strong>the same intelligence swept left across the price axis.</strong></p>",
       "links": [
         {
-          "text": "McKinsey: The economic potential of generative AI",
-          "url": "https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/the-economic-potential-of-generative-ai"
+          "text": "DeepInfra: DeepSeek V4.1 Flash",
+          "url": "https://deepinfra.com/deepseek-ai/DeepSeek-V4.1-Flash"
         },
         {
-          "text": "Sequoia: AI's $600B question",
-          "url": "https://www.sequoiacap.com/article/ais-600b-question/"
+          "text": "OpenRouter: Gemini 3.8 Flash",
+          "url": "https://openrouter.ai/google/gemini-3.8-flash"
+        },
+        {
+          "text": "OpenRouter: Claude Opus 5.5",
+          "url": "https://openrouter.ai/anthropic/claude-opus-5.5"
         }
       ]
     }
