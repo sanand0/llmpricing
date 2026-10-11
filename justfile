@@ -16,6 +16,10 @@ build:
     update hard https://arena.ai/leaderboard/text/hard-prompts
     update coding https://arena.ai/leaderboard/text/coding
 
+test:
+    uv run --python '>=3.12' --with pytest --with 'httpx>=0.28.1' --with 'typer>=0.16.1' --with 'websocket-client>=1.8.0' --with 'playwright>=1.56.0' pytest -q
+    node test_pareto.mjs
+
 push:
     git add .
     git commit -m "Update models"

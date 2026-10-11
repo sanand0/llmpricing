@@ -21,7 +21,7 @@ These are shown in green 🟢 and are the best LLMs to use.
 Some LLMs are "pareto suboptimal", i.e. there is no LLM worse in both cost and quality.
 These are shown in red 🔴 and are the LLMs to avoid.
 
-Last updated: **4 Oct 2026**
+Last updated: **11 Oct 2026**
 
 Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 
@@ -36,6 +36,11 @@ just build
 ```
 
 This downloads all three Arena leaderboards to temporary TSV files and updates `elo.csv`.
+Each update logs counts of added, changed, removed, and unchanged rows, followed by
+`+` added rows, `~` field changes (`old -> new`), and `-` removed rows on stderr.
+Rows missing from a leaderboard are retained. `--dry-run` previews the same changes.
+
+Run `just test` for the offline Python and JavaScript tests (requires `uv` and Node.js).
 
 Run `just push` to stage all changes, commit them as `Update models`, and push.
 
@@ -58,19 +63,34 @@ OpenRouter supplies launch and end dates, but does not supply costs in this flow
 
 `download.py --describe` prints the machine-readable CLI contract.
 
+The downloader sends CDP commands for a dedicated background tab, then closes that tab.
+It avoids Playwright's browser-wide initialization, which can stall on unrelated targets
+even after the browser WebSocket connects. `--cdp` accepts an HTTP endpoint or a browser
+WebSocket URL. `--timeout` bounds connection/commands and the total wait for table data.
+Failures leave the previous export untouched.
+
 `download.py` evaluates this script in the page via CDP:
 
 ```js
-const rows = $$("table tr");
+(() => {
+if (document.readyState !== "complete") return null;
+const rows = [...document.querySelectorAll("table tr")];
+if (rows.length < 2 || !rows[1].querySelector("td")) return null;
 const headers = [...rows[0].querySelectorAll("th, td")].map(d => d.innerText.trim());
 const priceIndex = headers.indexOf("Price $/M");
 if (priceIndex < 0) throw new Error("Arena table is missing Price $/M");
-["Model\tScore\tPrice $/M", ...rows.slice(1).map(d => {
-  const cells = d.querySelectorAll("td, th");
-  const [model, score] = [(cells[2].querySelector("a")?.innerText ?? cells[2].innerText).split(/\n/)[0], cells[3].innerText.split(/\s/)[0]];
+const data = rows.slice(1).map(d => [...d.querySelectorAll("td, th")]);
+// Arena initially renders skeleton/placeholder rows. Export only a complete table.
+if (data.some(cells => cells.length <= Math.max(3, priceIndex))) return null;
+if (data.some(cells => !/^\d+(?:\.\d+)?/.test(cells[3].innerText.trim()))) return null;
+return ["Model\tScore\tPrice $/M", ...data.map(cells => {
+  const model = (cells[2].querySelector("a")?.innerText ?? cells[2].innerText).split(/\n/)[0];
+  // Background tabs may concatenate score, confidence interval and status text.
+  const score = cells[3].innerText.trim().match(/^\d+(?:\.\d+)?/)[0];
   const price = cells[priceIndex].innerText.trim();
   return `${model}\t${score}\t${price}`;
 })].join("\n");
+})()
 ```
 
 # Billing rates

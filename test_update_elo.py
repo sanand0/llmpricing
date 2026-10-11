@@ -256,11 +256,105 @@ def test_cli_arena_write_and_dry_run(tmp_path: Path, monkeypatch) -> None:
     preview = runner.invoke(update_elo.app, [*args, "--dry-run"])
     assert preview.exit_code == 0, preview.output
     assert elo.read_bytes() == original
+    assert "elo.csv (dry run): 1 added, 1 changed, 0 removed, 0 unchanged" in preview.stderr
     result = runner.invoke(update_elo.app, args)
     assert result.exit_code == 0, result.output
     assert "Model\telo.csv\tarena.ai\nmodel\t2\t3\n" in result.output
     assert "1 models from Arena" in result.output
+    assert "elo.csv: 1 added, 1 changed, 0 removed, 0 unchanged" in result.stderr
+    assert "~ model: overall: '1' -> '1500'" in result.stderr
+    assert "+ new: overall='1400'; cpmi='0.5'" in result.stderr
     _, rows = read_elo_rows(elo)
     assert [(row["model"], row["overall"], row["cpmi"]) for row in rows] == [
         ("model", "1500", "2"), ("new", "1400", "0.5")
     ]
+
+
+def test_change_log_includes_cleared_fields_removals_and_excludes_unchanged(capsys):
+    before = [
+        {"model": "changed", "overall": "1500", "end": "2026-12-31"},
+        {"model": "removed", "overall": "1400", "end": ""},
+        {"model": "unchanged", "overall": "1300", "end": ""},
+    ]
+    after = [{**before[0], "end": ""}, before[2],
+             {"model": "added", "overall": "1550", "end": ""}]
+    update_elo.print_changes(before, after, elo_path=Path("elo.csv"), dry_run=False)
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err.splitlines() == [
+        "elo.csv: 1 added, 1 changed, 1 removed, 1 unchanged",
+        "  + added: overall='1550'",
+        "  ~ changed: end: '2026-12-31' -> ''",
+        "  - removed: overall='1400'",
+    ]
+
+
+@pytest.mark.parametrize("column, target", [
+    ("text", "overall"), ("overall", "overall"), ("hard", "hard"),
+    ("code", "coding"), ("coding", "coding"),
+])
+def test_cli_updates_only_selected_column_and_reports_noop(tmp_path, monkeypatch, column, target):
+    elo = tmp_path / "elo.csv"
+    original = dict(zip(HEADERS, ["existing", "1500", "1400", "1300", "2", "2026-08", "2026-12-31", "old"]))
+    absent = dict(zip(HEADERS, ["absent", "1200", "1100", "1000", "3", "2026-07", "", "old"]))
+    write_rows(elo, HEADERS, [original, absent])
+    tsv = tmp_path / "arena.tsv"
+    tsv.write_text("Model\tScore\tPrice $/M\nexisting\t1600\tN/A\n")
+    monkeypatch.setattr(update_elo, "fetch_openrouter_models", list)
+    args = [str(tsv), "--column", column, "--elo", str(elo)]
+    result = CliRunner().invoke(update_elo.app, args)
+    assert result.exit_code == 0, result.output
+    assert read_elo_rows(elo)[1] == [{**original, target: "1600"}, absent]
+    assert f"~ existing: {target}: '{original[target]}' -> '1600'" in result.stderr
+    assert "0 removed, 1 unchanged" in result.stderr
+    repeated = CliRunner().invoke(update_elo.app, args)
+    assert repeated.exit_code == 0, repeated.output
+    assert "0 added, 0 changed, 0 removed, 2 unchanged" in repeated.stderr
+    assert "~ existing" not in repeated.stderr
+
+
+def test_new_models_insert_by_score_and_get_fallback_launch():
+    rows = [dict(zip(HEADERS, ["existing", "1500", "", "", "2", "2026-08", "", "old"]))]
+    apply_updates(HEADERS, rows, target_column="overall",
+                  updates={"lower": "1400", "higher": "1600"}, matcher=OpenRouterMatcher([]),
+                  now=datetime(2026, 1, 2, tzinfo=UTC), arena_prices={})
+    assert [row["model"] for row in rows] == ["higher", "existing", "lower"]
+    assert rows[0]["launch"] == rows[2]["launch"] == "2025-12?"
+    assert rows[0]["cpmi"] == rows[2]["cpmi"] == ""
+
+
+@pytest.mark.parametrize("content", ["", "Model\tScore\n", "Model\tScore\nmodel\tinvalid\n",
+                                         "Model\tScore\n\t1500\n", "Model\tScore\nmodel\n"])
+def test_invalid_tsv_does_not_write_csv(tmp_path, monkeypatch, content):
+    elo = tmp_path / "elo.csv"
+    write_rows(elo, HEADERS, [])
+    original = elo.read_bytes()
+    tsv = tmp_path / "arena.tsv"
+    tsv.write_text(content)
+    monkeypatch.setattr(update_elo, "fetch_openrouter_models", lambda: pytest.fail("must validate before fetching"))
+    result = CliRunner().invoke(update_elo.app, [str(tsv), "--column", "overall", "--elo", str(elo)])
+    assert result.exit_code == 1
+    assert "Error:" in result.output
+    assert elo.read_bytes() == original
+
+
+def test_matcher_rejects_ambiguous_models():
+    matcher = OpenRouterMatcher([openrouter_model("provider-a/shared"), openrouter_model("provider-b/shared")])
+    assert matcher.match("shared") is None
+
+
+def test_metadata_fetch_failure_does_not_write_csv(tmp_path, monkeypatch):
+    elo = tmp_path / "elo.csv"
+    write_rows(elo, HEADERS, [])
+    original = elo.read_bytes()
+    tsv = tmp_path / "arena.tsv"
+    tsv.write_text("Model\tScore\tPrice $/M\nmodel\t1500\t$1 / $2\n")
+
+    def fail():
+        raise update_elo.httpx.ConnectError("offline")
+
+    monkeypatch.setattr(update_elo, "fetch_openrouter_models", fail)
+    result = CliRunner().invoke(update_elo.app, [str(tsv), "--column", "overall", "--elo", str(elo)])
+    assert result.exit_code == 1
+    assert "failed to fetch OpenRouter models: offline" in result.output
+    assert elo.read_bytes() == original

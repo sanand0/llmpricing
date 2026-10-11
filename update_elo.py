@@ -631,7 +631,7 @@ def print_summary(
 
     display_column = column if column.lower() == target_column else f"{column} -> {target_column}"
     typer.echo(
-        f"{'Dry run:' if dry_run else 'Updated'} "
+        f"{'Dry run: processed' if dry_run else 'Processed'} "
         f"{summary.updated} existing rows and added {summary.added} new rows "
         f"for {display_column} ({update_count} input models)."
     )
@@ -645,6 +645,35 @@ def print_summary(
         typer.echo(
             f"No safe OpenRouter match for {len(summary.unmatched_openrouter)} touched models: {preview}",
         )
+
+
+def print_changes(
+    before: list[EloRow], after: list[EloRow], *, elo_path: Path, dry_run: bool,
+) -> None:
+    """Report actual field changes on stderr, preserving pricing warnings on stdout."""
+
+    old = {row["model"]: row for row in before}
+    new = {row["model"]: row for row in after}
+    added, removed = new.keys() - old.keys(), old.keys() - new.keys()
+    changed = {model for model in old.keys() & new.keys() if old[model] != new[model]}
+    unchanged = len(old.keys() & new.keys()) - len(changed)
+    typer.echo(
+        f"{elo_path.name}{' (dry run)' if dry_run else ''}: "
+        f"{len(added)} added, {len(changed)} changed, {len(removed)} removed, {unchanged} unchanged",
+        err=True,
+    )
+    for model in sorted(added | changed | removed):
+        row = new.get(model, old.get(model))
+        fields = []
+        for key, value in row.items():
+            if key == "model":
+                continue
+            if model in changed and old[model][key] != value:
+                fields.append(f"{key}: {old[model][key]!r} -> {value!r}")
+            elif model not in changed and value:
+                fields.append(f"{key}={value!r}")
+        marker = "+" if model in added else "-" if model in removed else "~"
+        typer.echo(f"  {marker} {model}: {'; '.join(fields)}", err=True)
 
 
 def write_rows(elo_path: Path, headers: list[str], rows: list[EloRow]) -> None:
@@ -691,6 +720,7 @@ def main(
 
     try:
         headers, rows = read_elo_rows(elo_path)
+        before = [row.copy() for row in rows]
         target_column = resolve_column(column, headers)
         updates = read_updates(file_path)
         arena_prices = read_arena_prices(file_path)
@@ -715,6 +745,7 @@ def main(
     if not dry_run:
         write_rows(elo_path, headers, rows)
 
+    print_changes(before, rows, elo_path=elo_path, dry_run=dry_run)
     print_summary(
         summary,
         column=column,

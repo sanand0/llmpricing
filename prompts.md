@@ -1,5 +1,30 @@
 # Prompts
 
+## Fix leaderboard timeout, 11 Oct 2026
+
+<!--
+cd ~/code/llmpricing
+dev.sh -- codex --yolo --model gpt-6.1-sol --config model_reasoning_effort=medium
+-->
+
+Fix this issue, robustly.
+
+```
+❯ cd ~/code/llmpricing/; just build push
+Downloading overall leaderboard from https://arena.ai/leaderboard/text
+Error: timed out while loading https://arena.ai/leaderboard/text: BrowserType.connect_over_cdp: Timeout 60000ms exceeded.
+Call log:
+  - <ws preparing> retrieving websocket url from http://localhost:9222
+  - <ws connecting> ws://localhost:9222/devtools/browser/efff185f-ed5f-47ad-97a9-7d8972614461
+  - <ws connected> ws://localhost:9222/devtools/browser/efff185f-ed5f-47ad-97a9-7d8972614461
+```
+
+---
+
+Add a `just test` recipe. Ensure tests cover core functionality. Improve the logs to show what's added, changed or removed in elo.csv - making the output easy to review - without increasing code much.
+
+<!-- codex resume 01a128b0-10f9-7622-aed3-f4692cd1ae8e -->
+
 ## Update model costs and dates, 04 Oct 2026
 
 <!-- llmpricing - Update model costs and dates: https://chatgpt.com/c/6ac1cb32-8e44-83ec-9e55-0466a3c7c6fb (2026-10-04T12:19:14+08:00) -->
