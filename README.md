@@ -11,7 +11,7 @@ Each model has one representative price, not a historical price series. The mont
 A rough estimate of the **quality of an LLM** is
 the ELO score on the [LMSYS Leaderboard](https://arena.ai/).
 (This is like the chess ELO score, but for LLMs, where people compare 2 LLMs on the same task.)
-Pre-Arena API models such as GPT-3 Davinci and text-davinci-003 are retained in `elo.csv` with launch/price/end metadata but blank Elo; they provide historical context without mixing incompatible quality benchmarks into the chart or Pareto frontier.
+Pre-Arena API models such as GPT-3 Davinci and text-davinci-003 are retained in `elo.csv` with launch/price/end metadata but blank Elo; they provide historical context without mixing incompatible quality benchmarks into the chart or Pareto frontier. Models without a verifiable launch month are shown only in the latest month of the chart, rather than assigning them a fictitious launch date.
 
 This chart shows the cost and quality of each LLM.
 

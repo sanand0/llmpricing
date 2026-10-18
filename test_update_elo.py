@@ -313,14 +313,63 @@ def test_cli_updates_only_selected_column_and_reports_noop(tmp_path, monkeypatch
     assert "~ existing" not in repeated.stderr
 
 
-def test_new_models_insert_by_score_and_get_fallback_launch():
+def test_new_models_insert_by_score_without_inventing_launch():
     rows = [dict(zip(HEADERS, ["existing", "1500", "", "", "2", "2026-08", "", "old"]))]
     apply_updates(HEADERS, rows, target_column="overall",
                   updates={"lower": "1400", "higher": "1600"}, matcher=OpenRouterMatcher([]),
                   now=datetime(2026, 1, 2, tzinfo=UTC), arena_prices={})
     assert [row["model"] for row in rows] == ["higher", "existing", "lower"]
-    assert rows[0]["launch"] == rows[2]["launch"] == "2025-12?"
+    assert rows[0]["launch"] == rows[2]["launch"] == ""
     assert rows[0]["cpmi"] == rows[2]["cpmi"] == ""
+
+
+def test_arena_display_names_update_existing_slugs_without_adding_duplicates(capsys):
+    rows = [
+        dict(zip(HEADERS, ["glm-5.3-flash", "1475", "1501", "1525",
+                           "0.15", "2026-08", "", "https://api.deepinfra.com/models/list"])),
+        dict(zip(HEADERS, ["command-r", "1227", "1215", "1244",
+                           "0.5", "2024-03", "", "source"])),
+        dict(zip(HEADERS, ["command-r-plus", "1262", "1252", "1273",
+                           "3", "2024-04", "", "source"])),
+    ]
+    summary = apply_updates(
+        HEADERS, rows, target_column="overall",
+        updates={"GLM-5.3-Flash": "1474", "Command R": "1228", "Command R+": "1263"},
+        matcher=OpenRouterMatcher([]), now=datetime(2026, 10, 18, tzinfo=UTC),
+        arena_prices={"GLM-5.3-Flash": Decimal("0.05"), "Command R": Decimal("0.15"),
+                      "Command R+": Decimal("3")},
+    )
+    assert summary.added == 0
+    assert len(rows) == 3
+    assert [(r["model"], r["overall"]) for r in rows] == [
+        ("glm-5.3-flash", "1474"), ("command-r", "1228"), ("command-r-plus", "1263")
+    ]
+    assert rows[0]["cpmi"] == "0.15"  # Existing audited price takes precedence.
+    assert "glm-5.3-flash\t0.15\t0.05" in capsys.readouterr().out
+
+
+def test_arena_qualifier_reordering_maps_to_existing_variant():
+    rows = [dict(zip(HEADERS, ["claude-opus-4-5-20251101-high-32k",
+                                "1474", "1501", "1531", "5", "2025-11", "", "source"]))]
+    result = apply_updates(
+        HEADERS, rows, target_column="overall",
+        updates={"Claude Opus 4.5 (High, 32K, 20251101)": "1475"},
+        matcher=OpenRouterMatcher([]), now=datetime(2026, 10, 18, tzinfo=UTC),
+        arena_prices={},
+    )
+    assert result.added == 0
+    assert rows[0]["overall"] == "1475"
+
+
+def test_duplicate_normalized_identifiers_are_rejected():
+    rows = [dict(zip(HEADERS, [name, "1474", "", "", "", "", "", ""]))
+            for name in ("glm-5.3-flash", "GLM-5.3-Flash")]
+    with pytest.raises(UpdateEloError, match="Duplicate model identifiers"):
+        apply_updates(
+            HEADERS, rows, target_column="overall", updates={"GLM-5.3-Flash": "1475"},
+            matcher=OpenRouterMatcher([]), now=datetime(2026, 10, 18, tzinfo=UTC),
+            arena_prices={},
+        )
 
 
 @pytest.mark.parametrize("content", ["", "Model\tScore\n", "Model\tScore\nmodel\tinvalid\n",

@@ -88,10 +88,35 @@ class OpenRouterModel:
 def normalize_key(value: str) -> str:
     """Normalize a model identifier so small punctuation differences don't matter."""
 
-    normalized = value.lower()
+    normalized = value.casefold().replace("+", "-plus")
     normalized = re.sub(r"[^a-z0-9]+", "-", normalized)
     normalized = re.sub(r"-+", "-", normalized)
     return normalized.strip("-")
+
+
+# Arena display names occasionally reorder qualifiers or use a different slug.
+# Keep this explicit: stripping qualifiers broadly would merge distinct model variants.
+ARENA_NAME_ALIASES = {
+    "claude-opus-4-5-high-32k-20251101": "claude-opus-4-5-20251101-high-32k",
+    "claude-sonnet-4-5-high-32k-20250929": "claude-sonnet-4-5-20250929-high-32k",
+    "claude-opus-4-1-thinking-16k-20250805": "claude-opus-4-1-20250805-thinking-16k",
+    "claude-opus-4-thinking-16k-20250514": "claude-opus-4-20250514-thinking-16k",
+    "claude-sonnet-4-thinking-32k-20250514": "claude-sonnet-4-20250514-thinking-32k",
+    "claude-3-7-sonnet-thinking-32k-20250219": "claude-3-7-sonnet-20250219-thinking-32k",
+    "deepseek-v4-pro-preview-high": "deepseek-v4-pro-high-preview",
+    "deepseek-v4-flash-preview-high": "deepseek-v4-flash-high-preview",
+    "grok-4-fast-non-reasoning": "grok-4-fast-chat",
+    "qwen3-235b-a22b-non-thinking": "qwen3-235b-a22b-no-thinking",
+    "hy3-preview": "hunyuan-hy3-preview",
+    "mistral-large-2-2407": "mistral-large-2407",
+    "dolly-2-0-12b": "dolly-v2-12b",
+    "openassistant-pythia-12b": "oasst-pythia-12b",
+}
+
+
+def model_identity_key(value: str) -> str:
+    key = normalize_key(value)
+    return ARENA_NAME_ALIASES.get(key, key)
 
 
 def drop_provider_prefix(value: str) -> str:
@@ -313,10 +338,19 @@ def read_arena_prices(tsv_path: Path) -> dict[str, Decimal]:
 def apply_arena_prices(rows: list[EloRow], prices: dict[str, Decimal]) -> int:
     """Fill blank costs and print tab-separated differences, preserving existing costs."""
 
+    # Arena uses display names; elo.csv generally uses lower-case slug names.
+    # Treat them as the same model, but never combine distinct '+' variants.
+    normalized_prices: dict[str, Decimal] = {}
+    for model_name, price in prices.items():
+        key = model_identity_key(model_name)
+        if key in normalized_prices and normalized_prices[key] != price:
+            raise UpdateEloError(f"Conflicting Arena prices for model key {key!r}.")
+        normalized_prices[key] = price
+
     filled = 0
     warned = False
     for row in rows:
-        price = prices.get(row["model"])
+        price = normalized_prices.get(model_identity_key(row["model"]))
         if price is None:
             continue
         value = format_decimal(price)
@@ -578,15 +612,24 @@ def apply_updates(
     """Apply TSV scores and metadata updates to in-memory CSV rows."""
 
     summary = UpdateSummary()
-    rows_by_model = {row["model"]: row for row in rows}
+    rows_by_key: dict[str, EloRow] = {}
+    for row in rows:
+        key = model_identity_key(row["model"])
+        if key in rows_by_key:
+            raise UpdateEloError(
+                f"Duplicate model identifiers {rows_by_key[key]['model']!r} and "
+                f"{row['model']!r} (normalized as {key!r}); resolve before updating."
+            )
+        rows_by_key[key] = row
     new_rows: list[EloRow] = []
 
     for model_name, score in updates.items():
-        row = rows_by_model.get(model_name)
+        key = model_identity_key(model_name)
+        row = rows_by_key.get(key)
         is_new = row is None
         if row is None:
             row = new_row(headers, model_name)
-            rows_by_model[model_name] = row
+            rows_by_key[key] = row
             new_rows.append(row)
             summary.added += 1
         else:
@@ -607,8 +650,7 @@ def apply_updates(
             summary.priced += 1
         if metadata_update.launch_updated:
             summary.launched += 1
-        if is_new and not row["launch"]:
-            row["launch"] = month_label(now, month_offset=-1)
+        # Do not invent a recent launch date for historical models absent from OpenRouter.
 
     for row in new_rows:
         insert_row_by_score(rows, row, target_column=target_column)
@@ -681,7 +723,7 @@ def write_rows(elo_path: Path, headers: list[str], rows: list[EloRow]) -> None:
 
     validate_end_dates(rows, context=str(elo_path))
     with elo_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=headers)
+        writer = csv.DictWriter(handle, fieldnames=headers, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 

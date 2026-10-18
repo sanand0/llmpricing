@@ -157,7 +157,8 @@ const update = () => {
 
   const filteredModels = models.filter(
     (d) =>
-      d.launchMonth <= date &&
+      // Unknown launch dates must not appear retroactively throughout chart history.
+      (d.launchMonth ? d.launchMonth <= date : date === dates.at(-1)) &&
       (d.end ? d.end > `${date}-01` : true) &&
       (search ? matches.has(d.model) : true)
   );

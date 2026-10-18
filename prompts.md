@@ -1,5 +1,11 @@
 # Prompts
 
+## Fix llmpricing Name Duplicates, 18 Oct 2026
+
+<!-- Fix llmpricing Name Duplicates: https://chatgpt.com/c/6ad48ea3-0228-83ec-9afb-417d9b64dc80 (2026-10-18T17:38:01+08:00) -->
+
+On @LocalMCP2 see ~/code/llmpricing/ - see uncommitted changes in elo.csv. Any glaring errors? Also, why do I see a GLM-5.3-Flash as well as a glm-5.3-flash? Fix this.
+
 ## Fix leaderboard timeout, 11 Oct 2026
 
 <!--
