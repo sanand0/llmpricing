@@ -1,5 +1,28 @@
 # Prompts
 
+## Add Distinguished Professor, 01 Nov 2026
+
+<!--
+cd ~/code/llmpricing
+codex --model gpt-6-luna --config model_reasoning_effort=medium
+-->
+
+Revise the labels: "College graduate" -> "Graduate"; "Master's student" -> "Master's"; "PhD candidate" -> "PhD"; "Tenured professor" -> "Professor". Add "Laureate" at ELO 1500.
+
+---
+
+Revise Laureate to ELO 1550 instead of 1500.
+
+---
+
+Revise Professor to ELO 1500.
+
+---
+
+Because of these changes, intelligence.html fails with: Uncaught TypeError: Cannot read properties of undefined (reading 'cost') - intelligence.html:451. Fix and test.
+
+<!-- codex resume 01a196ce-5889-7ba3-884f-dd27bcad7725 -->
+
 ## Update README, 01 Nov 2026
 
 <!--

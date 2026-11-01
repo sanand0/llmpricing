@@ -55,10 +55,11 @@ const eloAnnotations = [
   { elo: 1100, label: "🎒 HS freshman" },
   { elo: 1200, label: "🎓 HS graduate" },
   { elo: 1300, label: "📚 College junior" },
-  { elo: 1350, label: "🏫 College grad" },
-  { elo: 1400, label: "🎓 Master's student" },
-  { elo: 1450, label: "🔬 PhD candidate" },
-  { elo: 1480, label: "🏛 Tenured professor" },
+  { elo: 1350, label: "🏫 Graduate" },
+  { elo: 1400, label: "🎓 Master's" },
+  { elo: 1450, label: "🔬 PhD" },
+  { elo: 1500, label: "🏛 Professor" },
+  { elo: 1550, label: "🏅 Laureate" },
 ];
 
 const updateOptimalStatus = (filteredModels) => {

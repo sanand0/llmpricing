@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LLM Pricing — Intelligence</title>
-  <meta name="description" content="The historical minimum input price of LLMs above seven labelled intelligence levels.">
+  <meta name="description" content="The historical minimum input price of LLMs above labelled intelligence levels.">
   <link
     rel="icon"
     type="image/svg+xml"
@@ -304,10 +304,11 @@ const levels = [
   { threshold: 1100, label: "HS freshman" },
   { threshold: 1200, label: "HS graduate" },
   { threshold: 1300, label: "College junior" },
-  { threshold: 1350, label: "College grad" },
-  { threshold: 1400, label: "Master's student" },
-  { threshold: 1450, label: "PhD candidate" },
-  { threshold: 1480, label: "Tenured professor" },
+  { threshold: 1350, label: "Graduate" },
+  { threshold: 1400, label: "Master's" },
+  { threshold: 1450, label: "PhD" },
+  { threshold: 1500, label: "Professor" },
+  { threshold: 1550, label: "Laureate" },
 ];
 
 const normalizeMonth = (value) => {
@@ -404,10 +405,10 @@ const svg = container.append("svg")
 
 svg.append("title")
   .attr("id", "intelligence-chart-title")
-  .text("Historical minimum LLM price above seven intelligence levels");
+  .text("Historical minimum LLM price by intelligence level");
 svg.append("desc")
   .attr("id", "intelligence-chart-desc")
-  .text("Seven descending step lines show the cheapest input price ever achieved by models above each overall Elo threshold.");
+  .text("Descending step lines show the cheapest input price ever achieved by models above each overall Elo threshold.");
 
 svg.append("g")
   .attr("class", "chart-grid")
@@ -447,8 +448,9 @@ const stepLine = d3.line()
 const finalLabels = series
   .map((curve, index) => {
     const point = lastPoint(curve);
-    return { index, point, targetY: y(point.cost), y: y(point.cost) };
+    return point ? { index, point, targetY: y(point.cost), y: y(point.cost) } : null;
   })
+  .filter(Boolean)
   .sort((a, b) => d3.ascending(a.targetY, b.targetY));
 
 const minGap = 19;
@@ -497,6 +499,15 @@ const cards = filters.selectAll("button")
 cards.each(function(curve) {
   const first = firstPoint(curve);
   const latest = lastPoint(curve);
+  if (!latest) {
+    d3.select(this).html(`
+      <div class="intelligence-filter-swatch"></div>
+      <div class="intelligence-filter-level">${escapeHtml(curve.label)}</div>
+      <div class="intelligence-filter-threshold">Elo &gt; ${curve.threshold}</div>
+      <div class="intelligence-filter-cost">No qualifying models yet</div>
+    `);
+    return;
+  }
   const factor = first.cost / latest.cost;
   d3.select(this).html(`
     <div class="intelligence-filter-swatch"></div>
@@ -583,6 +594,7 @@ groups.each(function(curve) {
     .on("click", () => updateSelection(curve.index));
 
   const latest = lastPoint(curve);
+  if (!latest) return;
   const endX = x(monthParse(latest.month));
   const endY = y(latest.cost);
   const textY = labelY.get(curve.index);
