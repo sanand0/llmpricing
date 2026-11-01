@@ -1,3 +1,5 @@
+set fallback
+
 build:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -15,6 +17,7 @@ build:
     update overall https://arena.ai/leaderboard/text
     update hard https://arena.ai/leaderboard/text/hard-prompts
     update coding https://arena.ai/leaderboard/text/coding
+    sed -i "s/^Last updated:.*/Last updated: **$(date '+%-d %b %Y')**/" README.md
 
 test:
     uv run --python '>=3.12' --with pytest --with 'httpx>=0.28.1' --with 'typer>=0.16.1' --with 'websocket-client>=1.8.0' --with 'playwright>=1.56.0' pytest -q

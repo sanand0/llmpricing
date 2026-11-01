@@ -1,5 +1,16 @@
 # Prompts
 
+## Update README, 01 Nov 2026
+
+<!--
+cd ~/code/llmpricing
+codex --model gpt-6-luna --config model_reasoning_effort=medium
+-->
+
+`just build` should also update the last updated date in README.md. Make minimal changes.
+
+<!-- codex resume 01a196be-4faa-7992-9eaa-a96dacb57a3b -->
+
 ## Fix llmpricing Name Duplicates, 18 Oct 2026
 
 <!-- Fix llmpricing Name Duplicates: https://chatgpt.com/c/6ad48ea3-0228-83ec-9afb-417d9b64dc80 (2026-10-18T17:38:01+08:00) -->
