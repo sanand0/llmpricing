@@ -12,6 +12,32 @@ import download
 TSV = "Model\tScore\tPrice $/M\nmodel\t1500\t$1 / $2"
 
 
+def extract(tables, ready="complete", rendered=True):
+    """Run the real extractor with independently controllable DOM and rendered text."""
+    script = """
+    const tables = JSON.parse(process.argv[1]);
+    const rendered = JSON.parse(process.argv[4]);
+    const cell = value => {
+        const textContent = typeof value === 'string' ? value : value.text;
+        return {textContent, innerText: rendered ? textContent : '',
+            querySelector: () => typeof value === 'object' && value.link ? cell(value.link) : null};
+    };
+    global.document = {
+        readyState: process.argv[3], title: 'Arena',
+        querySelectorAll: selector => tables.map(rows => ({
+            querySelectorAll: () => rows.map(row => ({querySelectorAll: () => row.map(cell)}))
+        }))
+    };
+    global.location = {href: 'https://arena.ai/leaderboard/chat/text'};
+    console.log(JSON.stringify(eval(process.argv[2])));
+    """
+    result = subprocess.run(
+        ["node", "-e", script, json.dumps(tables), download.EXTRACT_SCRIPT, ready, json.dumps(rendered)],
+        check=True, capture_output=True, text=True,
+    )
+    return json.loads(result.stdout)
+
+
 @pytest.mark.parametrize(
     "data, expected",
     [
@@ -27,21 +53,44 @@ TSV = "Model\tScore\tPrice $/M\nmodel\t1500\t$1 / $2"
 def test_extraction_waits_for_complete_table(data, expected, ready):
     """Run the actual JavaScript against loading and populated DOM-shaped rows."""
     rows = [["Rank", "Rank", "Model", "Score", "Price $/M"], *data]
-    script = """
-    const rows = JSON.parse(process.argv[1]);
-    global.document = {readyState: process.argv[3], querySelectorAll: () => rows.map((row, index) => ({
-        querySelector: () => index ? {} : null,
-        querySelectorAll: () => row.map(innerText => ({innerText, querySelector: () => null}))
-    }))};
-    console.log(JSON.stringify(eval(process.argv[2])));
-    """
-    result = subprocess.run(
-        ["node", "-e", script, json.dumps(rows), download.EXTRACT_SCRIPT, ready],
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    assert json.loads(result.stdout) == (expected if ready == "complete" else None)
+    result = extract([rows], ready)
+    if expected is None:
+        assert result["waiting"]
+    else:
+        assert result == expected
+
+
+@pytest.mark.parametrize("rendered", [True, False])
+def test_extraction_uses_headers_and_dom_text(rendered):
+    unrelated = [["Model", "Votes"], ["wrong-model", "9999"]]
+    leaderboard = [
+        [" Votes ", " Price\n$/M ", " SCORE ", "Rank", " Model "],
+        ["5000", "$1 / $2", "1500±5Preliminary", "1", "model"],
+    ]
+    assert extract([unrelated, leaderboard], "loading", rendered) == TSV
+
+
+@pytest.mark.parametrize(
+    "rows, reason",
+    [
+        ([], "table"),
+        ([["Model", "Score"], ["model", "1500"]], "Price $/M"),
+        ([["Model", "Score", "Price $/M"], ["", "1500", "$1"]], "model"),
+        ([["Model", "Score", "Price $/M"], ["model", "", "$1"]], "score"),
+        ([["Model", "Score", "Price $/M"], ["model", "1500", ""]], "price"),
+    ],
+)
+def test_extraction_reports_why_data_is_not_ready(rows, reason):
+    assert reason in extract([rows])["waiting"]
+
+
+def test_unavailable_price_is_valid_data():
+    assert extract([[["Model", "Score", "Price $/M"], ["model", "1500", "N/A"]]]) == TSV.replace("$1 / $2", "N/A")
+
+
+@pytest.mark.parametrize("model", ["model\nProvider", {"text": "modelProvider", "link": "model"}])
+def test_model_metadata_is_not_part_of_name(model):
+    assert extract([[["Model", "Score", "Price $/M"], [model, "1500", "$1 / $2"]]]) == TSV
 
 
 class FakeSocket:
@@ -191,13 +240,13 @@ def test_protocol_errors_are_reported():
 
 
 def test_table_wait_has_overall_deadline_and_cleans_up(tmp_path, monkeypatch):
-    socket = FakeSocket(values=(None,))
+    socket = FakeSocket(values=({"waiting": "No leaderboard table found (page: Just a moment...)"},))
     install_socket(monkeypatch, socket)
     now = [0.0]
     monkeypatch.setattr(download.time, "monotonic", lambda: now[0])
     monkeypatch.setattr(download.time, "sleep", lambda _: now.__setitem__(0, 2.0))
     output = tmp_path / "out"
-    with pytest.raises(TimeoutError, match="waiting for leaderboard rows"):
+    with pytest.raises(TimeoutError, match="Just a moment"):
         download.write_leaderboard(
             url="https://arena.ai",
             output=output,

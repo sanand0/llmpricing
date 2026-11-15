@@ -1,5 +1,18 @@
 # Prompts
 
+## Fix leaderboard timeout, 15 Oct 2026
+
+<!--
+cd ~/code/llmpricing
+codex --model gpt-6.1-sol --config model_reasoning_effort=medium
+-->
+
+Fix the "Error: timed out downloading https://arena.ai/leaderboard/text" issue when I run `just build`.
+This has happened before.
+Fix this robustly, to handle likely future changes, keeping it simple. Think about what's more likely to change and what's less likely to, and what approaches might remain stable.
+
+<!-- codex resume 01a1de32-aa8e-7571-9f8f-35deaf5612c2 -->
+
 ## Add Distinguished Professor, 01 Nov 2026
 
 <!--

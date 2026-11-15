@@ -21,7 +21,7 @@ These are shown in green 🟢 and are the best LLMs to use.
 Some LLMs are "pareto suboptimal", i.e. there is no LLM worse in both cost and quality.
 These are shown in red 🔴 and are the LLMs to avoid.
 
-Last updated: **8 Nov 2026**
+Last updated: **15 Nov 2026**
 
 Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 
@@ -69,29 +69,14 @@ even after the browser WebSocket connects. `--cdp` accepts an HTTP endpoint or a
 WebSocket URL. `--timeout` bounds connection/commands and the total wait for table data.
 Failures leave the previous export untouched.
 
-`download.py` evaluates this script in the page via CDP:
-
-```js
-(() => {
-if (document.readyState !== "complete") return null;
-const rows = [...document.querySelectorAll("table tr")];
-if (rows.length < 2 || !rows[1].querySelector("td")) return null;
-const headers = [...rows[0].querySelectorAll("th, td")].map(d => d.innerText.trim());
-const priceIndex = headers.indexOf("Price $/M");
-if (priceIndex < 0) throw new Error("Arena table is missing Price $/M");
-const data = rows.slice(1).map(d => [...d.querySelectorAll("td, th")]);
-// Arena initially renders skeleton/placeholder rows. Export only a complete table.
-if (data.some(cells => cells.length <= Math.max(3, priceIndex))) return null;
-if (data.some(cells => !/^\d+(?:\.\d+)?/.test(cells[3].innerText.trim()))) return null;
-return ["Model\tScore\tPrice $/M", ...data.map(cells => {
-  const model = (cells[2].querySelector("a")?.innerText ?? cells[2].innerText).split(/\n/)[0];
-  // Background tabs may concatenate score, confidence interval and status text.
-  const score = cells[3].innerText.trim().match(/^\d+(?:\.\d+)?/)[0];
-  const price = cells[priceIndex].innerText.trim();
-  return `${model}\t${score}\t${price}`;
-})].join("\n");
-})()
-```
+The downloader identifies the leaderboard by its `Model`, `Score`, and `Price $/M`
+headers, so column reordering, extra columns, and unrelated tables do not affect exports.
+It reads DOM text rather than relying on layout in a background tab, and exports as
+soon as every row has a model, score, and price (including explicit `N/A` prices).
+It does not wait for the whole page or unrelated assets to finish loading. Redirects
+are handled by the browser. A timeout reports the last missing data; when no table
+is available it includes the page title and final URL, exposing security checks or
+changed routes. The extraction script lives in `download.py`.
 
 # Billing rates
 

@@ -28,23 +28,38 @@ app = typer.Typer(add_completion=False, no_args_is_help=True)
 
 EXTRACT_SCRIPT = r"""
 (() => {
-if (document.readyState !== "complete") return null;
-const rows = [...document.querySelectorAll("table tr")];
-if (rows.length < 2 || !rows[1].querySelector("td")) return null;
-const headers = [...rows[0].querySelectorAll("th, td")].map(d => d.innerText.trim());
-const priceIndex = headers.indexOf("Price $/M");
-if (priceIndex < 0) throw new Error("Arena table is missing Price $/M");
-const data = rows.slice(1).map(d => [...d.querySelectorAll("td, th")]);
-// Arena initially renders skeleton/placeholder rows. Export only a complete table.
-if (data.some(cells => cells.length <= Math.max(3, priceIndex))) return null;
-if (data.some(cells => !/^\d+(?:\.\d+)?/.test(cells[3].innerText.trim()))) return null;
-return ["Model\tScore\tPrice $/M", ...data.map(cells => {
-  const model = (cells[2].querySelector("a")?.innerText ?? cells[2].innerText).split(/\n/)[0];
-  // Background tabs may concatenate score, confidence interval and status text.
-  const score = cells[3].innerText.trim().match(/^\d+(?:\.\d+)?/)[0];
-  const price = cells[priceIndex].innerText.trim();
-  return `${model}\t${score}\t${price}`;
-})].join("\n");
+// Labels are more stable than column positions, CSS classes or framework internals.
+// textContent works in background tabs without waiting for layout or unrelated assets.
+const text = node => node.textContent.trim().replace(/\s+/g, " ");
+const required = ["Model", "Score", "Price $/M"];
+let waiting = "No leaderboard table found";
+for (const table of document.querySelectorAll("table")) {
+  const rows = [...table.querySelectorAll("tr")];
+  if (!rows.length) continue;
+  const headers = [...rows[0].querySelectorAll("th, td")].map(text);
+  const indices = required.map(label => headers.findIndex(h => h.toLowerCase() === label.toLowerCase()));
+  if (indices.includes(-1)) {
+    waiting = `Missing columns: ${required.filter((_, i) => indices[i] < 0).join(", ")}; found: ${headers.join(", ")}`;
+    continue;
+  }
+  if (rows.length < 2) return {waiting: "Waiting for leaderboard rows"};
+  const lines = [required.join("\t")];
+  for (const [i, row] of rows.slice(1).entries()) {
+    const cells = [...row.querySelectorAll("td, th")];
+    // Never export a partially populated table (Arena initially serves skeletons).
+    if (cells.length <= Math.max(...indices)) return {waiting: `Incomplete row ${i + 1}`};
+    const [modelCell, scoreCell, priceCell] = indices.map(index => cells[index]);
+    const modelNode = modelCell.querySelector("a") ?? modelCell;
+    const model = modelNode.textContent.trim().split(/\n/)[0].replace(/\s+/g, " ");
+    // Scores may concatenate confidence intervals and status badges without spaces.
+    const score = text(scoreCell).match(/^\d+(?:\.\d+)?(?=\s|±|$)/)?.[0];
+    const price = text(priceCell);
+    if (!model || !score || !price) return {waiting: `Row ${i + 1} has an empty model, invalid score or empty price`};
+    lines.push(`${model}\t${score}\t${price}`);
+  }
+  return lines.join("\n");
+}
+return {waiting: `${waiting} (page: ${document.title}; URL: ${location.href})`};
 })()
 """.strip()
 
@@ -153,9 +168,10 @@ def write_leaderboard(
                 raise RuntimeError(f"Navigation to {url} failed: {error}")
             typer.echo("Waiting for leaderboard rows", err=True)
             deadline = time.monotonic() + timeout / 1000
+            waiting = "waiting for leaderboard rows"
             while True:
                 if time.monotonic() >= deadline:
-                    raise TimeoutError(f"waiting for leaderboard rows at {url}")
+                    raise TimeoutError(f"waiting for leaderboard rows at {url}: {waiting}")
                 result = client.send(
                     "Runtime.evaluate",
                     {
@@ -173,6 +189,8 @@ def write_leaderboard(
                 value = result.get("result", {}).get("value")
                 if isinstance(value, str) and value.strip():
                     break
+                if isinstance(value, dict):
+                    waiting = value.get("waiting", waiting)
                 time.sleep(min(0.25, max(0, deadline - time.monotonic())))
         finally:
             try:
