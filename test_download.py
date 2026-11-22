@@ -12,27 +12,40 @@ import download
 TSV = "Model\tScore\tPrice $/M\nmodel\t1500\t$1 / $2"
 
 
-def extract(tables, ready="complete", rendered=True):
+def extract(tables, ready="complete", rendered=True, ranking=None):
     """Run the real extractor with independently controllable DOM and rendered text."""
     script = """
     const tables = JSON.parse(process.argv[1]);
     const rendered = JSON.parse(process.argv[4]);
+    const ranking = JSON.parse(process.argv[5]);
     const cell = value => {
         const textContent = typeof value === 'string' ? value : value.text;
         return {textContent, innerText: rendered ? textContent : '',
-            querySelector: () => typeof value === 'object' && value.link ? cell(value.link) : null};
+            querySelector: selector => selector === 'a' && typeof value === 'object' && value.link ? cell(value.link)
+                : selector === '[title]' && value.title ? {title: value.title} : null};
     };
+    let clicked = false;
+    const button = {textContent: 'View all', click: () => { clicked = true; }};
+    const lists = ranking ? [{
+        previousElementSibling: {children: ranking.headers.map(cell)},
+        children: ranking.rows.map(row => ({children: row.map(cell)})),
+        closest: () => ({querySelectorAll: () => ranking.collapsed ? [button] : []}),
+    }] : [];
     global.document = {
         readyState: process.argv[3], title: 'Arena',
-        querySelectorAll: selector => tables.map(rows => ({
+        querySelectorAll: selector => selector === 'ol' ? lists : tables.map(rows => ({
             querySelectorAll: () => rows.map(row => ({querySelectorAll: () => row.map(cell)}))
         }))
     };
     global.location = {href: 'https://arena.ai/leaderboard/chat/text'};
-    console.log(JSON.stringify(eval(process.argv[2])));
+    const result = eval(process.argv[2]);
+    console.log(JSON.stringify(clicked ? {...result, clicked} : result));
     """
     result = subprocess.run(
-        ["node", "-e", script, json.dumps(tables), download.EXTRACT_SCRIPT, ready, json.dumps(rendered)],
+        [
+            "node", "-e", script, json.dumps(tables), download.EXTRACT_SCRIPT,
+            ready, json.dumps(rendered), json.dumps(ranking),
+        ],
         check=True, capture_output=True, text=True,
     )
     return json.loads(result.stdout)
@@ -91,6 +104,25 @@ def test_unavailable_price_is_valid_data():
 @pytest.mark.parametrize("model", ["model\nProvider", {"text": "modelProvider", "link": "model"}])
 def test_model_metadata_is_not_part_of_name(model):
     assert extract([[["Model", "Score", "Price $/M"], [model, "1500", "$1 / $2"]]]) == TSV
+
+
+@pytest.mark.parametrize("collapsed", [False, True])
+def test_ranked_list_expands_and_reads_input_output_price(collapsed):
+    ranking = {
+        "headers": ["Model Ranking", "Score", "Cost per task (P50)", "Blended price $/M (3:1)"],
+        "rows": [
+            [{"text": "1model", "link": "model"}, "1,500", "$0.05", {"text": "$8", "title": "$1 / $2"}],
+            [{"text": "2unpriced", "link": "unpriced"}, "1,499", "N/A", "N/A"],
+        ],
+        "collapsed": collapsed,
+    }
+    result = extract([], ranking=ranking)
+    if collapsed:
+        assert result["clicked"] and result["waiting"]
+    else:
+        assert result == TSV + "\nunpriced\t1499\tN/A"
+        ranking["rows"][0][3] = "$8"
+        assert "price" in extract([], ranking=ranking)["waiting"]
 
 
 class FakeSocket:

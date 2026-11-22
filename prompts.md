@@ -1,5 +1,16 @@
 # Prompts
 
+## Fix leaderboard, 22 Nov 2026
+
+<!--
+cd ~/code/llmpricing
+codex --model gpt-6.2-sol --config model_reasoning_effort=medium
+-->
+
+Run `just build`. Fix failures if any.
+
+<!-- codex resume 01a20180-3b37-7e61-8266-ce1573817648 -->
+
 ## Fix leaderboard timeout, 15 Oct 2026
 
 <!--

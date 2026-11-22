@@ -21,7 +21,7 @@ These are shown in green 🟢 and are the best LLMs to use.
 Some LLMs are "pareto suboptimal", i.e. there is no LLM worse in both cost and quality.
 These are shown in red 🔴 and are the LLMs to avoid.
 
-Last updated: **15 Nov 2026**
+Last updated: **22 Nov 2026**
 
 Alternatives: [ArtificialAnalysis.ai](https://artificialanalysis.ai/)
 
@@ -69,14 +69,15 @@ even after the browser WebSocket connects. `--cdp` accepts an HTTP endpoint or a
 WebSocket URL. `--timeout` bounds connection/commands and the total wait for table data.
 Failures leave the previous export untouched.
 
-The downloader identifies the leaderboard by its `Model`, `Score`, and `Price $/M`
-headers, so column reordering, extra columns, and unrelated tables do not affect exports.
-It reads DOM text rather than relying on layout in a background tab, and exports as
-soon as every row has a model, score, and price (including explicit `N/A` prices).
-It does not wait for the whole page or unrelated assets to finish loading. Redirects
-are handled by the browser. A timeout reports the last missing data; when no table
-is available it includes the page title and final URL, exposing security checks or
-changed routes. The extraction script lives in `download.py`.
+The downloader finds the ranking by its column labels and opens **View all** when
+Arena shows a preview. In the current ranked list, the blended price's tooltip
+contains the input/output price pair used by the TSV. The downloader also accepts
+Arena's earlier `Model`, `Score`, and `Price $/M` table.
+
+Extraction reads DOM text in a background tab and waits for every row to have a
+model, score, and price (including explicit `N/A`). The browser handles redirects.
+A timeout reports the last missing data and includes the page title and URL when
+the ranking is absent.
 
 # Billing rates
 

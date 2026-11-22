@@ -32,32 +32,53 @@ EXTRACT_SCRIPT = r"""
 // textContent works in background tabs without waiting for layout or unrelated assets.
 const text = node => node.textContent.trim().replace(/\s+/g, " ");
 const required = ["Model", "Score", "Price $/M"];
+const columnIndices = (headers, labels) =>
+  labels.map(label => headers.findIndex(h => h.toLowerCase() === label.toLowerCase()));
+const exportRows = (rows, indices, getCells, blendedPrice = false) => {
+  if (!rows.length) return {waiting: "Waiting for leaderboard rows"};
+  const lines = [required.join("\t")];
+  const lastIndex = Math.max(...indices);
+  for (const [i, row] of rows.entries()) {
+    const cells = getCells(row);
+    if (cells.length <= lastIndex) return {waiting: `Incomplete row ${i + 1}`};
+    const [modelCell, scoreCell, priceCell] = indices.map(index => cells[index]);
+    const modelNode = modelCell.querySelector("a") ?? (blendedPrice ? null : modelCell);
+    const model = modelNode?.textContent.trim().split(/\n/)[0].replace(/\s+/g, " ");
+    // Scores may concatenate confidence intervals and status badges without spaces.
+    const score = text(scoreCell).match(/^\d+(?:,\d{3})*(?:\.\d+)?(?=\s|±|$)/)?.[0].replace(/,/g, "");
+    const displayedPrice = text(priceCell);
+    // The blended-price cell's tooltip supplies the original input/output pair.
+    const price = blendedPrice && displayedPrice !== "N/A"
+      ? priceCell.querySelector("[title]")?.title.trim().match(/^\$[\d.,]+\s*\/\s*\$[\d.,]+$/)?.[0]
+      : displayedPrice;
+    if (!model || !score || !price) return {waiting: `Row ${i + 1} has an empty model, invalid score or missing input/output price`};
+    lines.push([model, score, price].join("\t"));
+  }
+  return lines.join("\n");
+};
 let waiting = "No leaderboard table found";
 for (const table of document.querySelectorAll("table")) {
   const rows = [...table.querySelectorAll("tr")];
   if (!rows.length) continue;
   const headers = [...rows[0].querySelectorAll("th, td")].map(text);
-  const indices = required.map(label => headers.findIndex(h => h.toLowerCase() === label.toLowerCase()));
+  const indices = columnIndices(headers, required);
   if (indices.includes(-1)) {
     waiting = `Missing columns: ${required.filter((_, i) => indices[i] < 0).join(", ")}; found: ${headers.join(", ")}`;
     continue;
   }
-  if (rows.length < 2) return {waiting: "Waiting for leaderboard rows"};
-  const lines = [required.join("\t")];
-  for (const [i, row] of rows.slice(1).entries()) {
-    const cells = [...row.querySelectorAll("td, th")];
-    // Never export a partially populated table (Arena initially serves skeletons).
-    if (cells.length <= Math.max(...indices)) return {waiting: `Incomplete row ${i + 1}`};
-    const [modelCell, scoreCell, priceCell] = indices.map(index => cells[index]);
-    const modelNode = modelCell.querySelector("a") ?? modelCell;
-    const model = modelNode.textContent.trim().split(/\n/)[0].replace(/\s+/g, " ");
-    // Scores may concatenate confidence intervals and status badges without spaces.
-    const score = text(scoreCell).match(/^\d+(?:\.\d+)?(?=\s|±|$)/)?.[0];
-    const price = text(priceCell);
-    if (!model || !score || !price) return {waiting: `Row ${i + 1} has an empty model, invalid score or empty price`};
-    lines.push(`${model}\t${score}\t${price}`);
+  return exportRows(rows.slice(1), indices, row => row.querySelectorAll("td, th"));
+}
+for (const list of document.querySelectorAll("ol")) {
+  const headers = Array.from(list.previousElementSibling?.children ?? [], text);
+  const indices = columnIndices(headers, ["Model Ranking", "Score", "Blended price $/M (3:1)"]);
+  if (indices.includes(-1)) continue;
+  const buttons = list.closest("section")?.querySelectorAll('button[aria-expanded="false"]') ?? [];
+  const expand = [...buttons].find(button => text(button).toLowerCase() === "view all");
+  if (expand) {
+    expand.click();
+    return {waiting: "Waiting for the full model ranking to expand"};
   }
-  return lines.join("\n");
+  return exportRows([...list.children], indices, row => row.children, true);
 }
 return {waiting: `${waiting} (page: ${document.title}; URL: ${location.href})`};
 })()
